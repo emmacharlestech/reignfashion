@@ -23,19 +23,23 @@ function admin_header(string $title, ?array $admin = null, string $active = ''):
 <body class="<?= $admin ? 'is-auth' : 'is-guest' ?>">
 <?php if ($admin): ?>
   <header class="topbar">
-    <a href="index.php" class="topbar__brand">
+    <a href="./" class="topbar__brand">
       <img src="../assets/images/brand/logo-mark-mask.png" alt="" width="40" height="29">
       <span>Reign Fashion <em>Admin</em></span>
     </a>
-    <nav class="topbar__nav" aria-label="Admin">
-      <a href="index.php" <?= $active === 'inbox' ? 'aria-current="page"' : '' ?>>Enquiries</a>
-      <a href="academy.php" <?= $active === 'academy' ? 'aria-current="page"' : '' ?>>Academy</a>
-      <a href="gallery.php" <?= $active === 'gallery' ? 'aria-current="page"' : '' ?>>Gallery</a>
-      <a href="testimonials.php" <?= $active === 'testimonials' ? 'aria-current="page"' : '' ?>>Testimonials</a>
-      <a href="settings.php" <?= $active === 'settings' ? 'aria-current="page"' : '' ?>>Settings</a>
-      <a href="password.php" <?= $active === 'account' ? 'aria-current="page"' : '' ?>>Account</a>
+    <button type="button" class="topbar__toggle" aria-expanded="false" aria-controls="admin-nav">
+      <span class="topbar__toggle-bars" aria-hidden="true"></span>
+      <span class="topbar__toggle-label">Menu</span>
+    </button>
+    <nav class="topbar__nav" id="admin-nav" aria-label="Admin">
+      <a href="./" <?= $active === 'inbox' ? 'aria-current="page"' : '' ?>>Enquiries</a>
+      <a href="academy" <?= $active === 'academy' ? 'aria-current="page"' : '' ?>>Academy</a>
+      <a href="gallery" <?= $active === 'gallery' ? 'aria-current="page"' : '' ?>>Gallery</a>
+      <a href="testimonials" <?= $active === 'testimonials' ? 'aria-current="page"' : '' ?>>Testimonials</a>
+      <a href="settings" <?= $active === 'settings' ? 'aria-current="page"' : '' ?>>Settings</a>
+      <a href="password" <?= $active === 'account' ? 'aria-current="page"' : '' ?>>Account</a>
       <a href="../" target="_blank" rel="noopener">View site ↗</a>
-      <form method="post" action="logout.php" class="topbar__logout">
+      <form method="post" action="logout" class="topbar__logout">
         <?= csrf_field() ?>
         <button type="submit">Log out</button>
       </form>
@@ -52,6 +56,7 @@ function admin_footer(): void
 {
     ?>
   </main>
+  <script src="admin.js" defer></script>
 </body>
 </html>
 <?php

@@ -36,7 +36,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                 $upd = db()->prepare('UPDATE testimonials SET sort_order = ? WHERE id = ?');
                 foreach ($ids as $i => $tid) $upd->execute([($i + 1) * 10, $tid]);
             }
-            redirect('testimonials.php#t-' . $id);
+            redirect('testimonials#t-' . $id);
         } elseif ($action === 'delete') {
             db()->prepare('DELETE FROM testimonials WHERE id = ?')->execute([$id]);
             flash('Testimonial removed.');
@@ -44,7 +44,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     } catch (RuntimeException $e) {
         flash($e->getMessage(), 'error');
     }
-    redirect('testimonials.php');
+    redirect('testimonials');
 }
 
 $items = testimonials();

@@ -13,7 +13,7 @@ $enq = $stmt->fetch();
 if (!$enq) {
     http_response_code(404);
     admin_header('Not found', $admin, 'inbox');
-    echo '<div class="empty"><p class="empty__title">That enquiry no longer exists.</p><p><a class="btn" href="index.php">Back to enquiries</a></p></div>';
+    echo '<div class="empty"><p class="empty__title">That enquiry no longer exists.</p><p><a class="btn" href="./">Back to enquiries</a></p></div>';
     admin_footer();
     exit;
 }
@@ -26,14 +26,14 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     if ($action === 'status' && isset(STATUSES[$_POST['status'] ?? ''])) {
         db()->prepare('UPDATE enquiries SET status = ? WHERE id = ?')->execute([$_POST['status'], $id]);
         flash('Marked as ' . strtolower(STATUSES[$_POST['status']]) . '.');
-        redirect("enquiry.php?id=$id");
+        redirect("enquiry?id=$id");
     }
 
     if ($action === 'notes') {
         $notes = clean_text($_POST['admin_notes'] ?? '', 5000);
         db()->prepare('UPDATE enquiries SET admin_notes = ? WHERE id = ?')->execute([$notes !== '' ? $notes : null, $id]);
         flash('Notes saved.');
-        redirect("enquiry.php?id=$id");
+        redirect("enquiry?id=$id");
     }
 
     if ($action === 'delete') {
@@ -47,11 +47,11 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         }
         db()->prepare('DELETE FROM enquiries WHERE id = ?')->execute([$id]);   // files rows cascade
         flash("Enquiry {$enq['ref']} deleted.");
-        redirect('index.php');
+        redirect('./');
     }
 
     flash('Unknown action.', 'error');
-    redirect("enquiry.php?id=$id");
+    redirect("enquiry?id=$id");
 }
 
 // Opening a new enquiry doesn't change its status: the owner decides when it's "contacted".
@@ -67,7 +67,7 @@ $mailSubject = "Your Reign Fashion enquiry {$enq['ref']}";
 
 admin_header($enq['ref'] . ' · ' . $enq['name'], $admin, 'inbox');
 ?>
-    <p class="crumbs"><a href="index.php">← All enquiries</a></p>
+    <p class="crumbs"><a href="./">← All enquiries</a></p>
 
     <div class="page__head">
       <div>
@@ -95,8 +95,8 @@ admin_header($enq['ref'] . ' · ' . $enq['name'], $admin, 'inbox');
         <ul class="thumbs">
 <?php foreach ($files as $f): ?>
           <li>
-            <a href="file.php?id=<?= (int) $f['id'] ?>" target="_blank" rel="noopener">
-              <img src="file.php?id=<?= (int) $f['id'] ?>" alt="Inspiration image <?= e($f['original_name']) ?>" loading="lazy">
+            <a href="file?id=<?= (int) $f['id'] ?>" target="_blank" rel="noopener">
+              <img src="file?id=<?= (int) $f['id'] ?>" alt="Inspiration image <?= e($f['original_name']) ?>" loading="lazy">
             </a>
             <span><?= e($f['original_name']) ?> · <?= number_format($f['size_bytes'] / 1048576, 1) ?> MB</span>
           </li>

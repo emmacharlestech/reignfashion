@@ -35,7 +35,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             ->execute([password_hash($new, PASSWORD_DEFAULT), $admin['id']]);
         session_regenerate_id(true);
         flash('Your password has been changed.');
-        redirect('password.php');
+        redirect('password');
     }
 }
 

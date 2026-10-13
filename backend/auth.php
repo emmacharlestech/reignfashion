@@ -78,8 +78,8 @@ function require_admin(): array
     admin_headers();
     $admin = current_admin();
     if (!$admin) {
-        $next = basename($_SERVER['SCRIPT_NAME']) . (!empty($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : '');
-        redirect('login.php?next=' . urlencode($next));
+        $next = preg_replace('/\.php$/', '', basename($_SERVER['SCRIPT_NAME'])) . (!empty($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : '');
+        redirect('login?next=' . urlencode($next));
     }
     return $admin;
 }

@@ -67,7 +67,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                     foreach ($ids as $i => $itemId) $upd->execute([($i + 1) * 10, $itemId]);
                 }
             }
-            redirect('gallery.php#item-' . $id);
+            redirect('gallery#item-' . $id);
         } elseif ($action === 'delete') {
             $s = db()->prepare('SELECT src, title FROM gallery_items WHERE id = ?');
             $s->execute([$id]);
@@ -80,7 +80,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     } catch (RuntimeException $e) {
         flash($e->getMessage(), 'error');
     }
-    redirect('gallery.php');
+    redirect('gallery');
 }
 
 $items = gallery_items();

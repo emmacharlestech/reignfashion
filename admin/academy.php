@@ -12,7 +12,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     require_csrf();
     $id = (int) ($_POST['id'] ?? 0);
     $action = (string) ($_POST['action'] ?? '');
-    $back = 'academy.php' . (!empty($_POST['return']) && preg_match('/^[\w=&%-]*$/', $_POST['return']) ? '?' . $_POST['return'] : '');
+    $back = 'academy' . (!empty($_POST['return']) && preg_match('/^[\w=&%-]*$/', $_POST['return']) ? '?' . $_POST['return'] : '');
 
     if ($action === 'status' && isset(ACADEMY_STATUSES[$_POST['status'] ?? ''])) {
         db()->prepare('UPDATE academy_registrations SET status = ? WHERE id = ?')->execute([$_POST['status'], $id]);
@@ -71,7 +71,7 @@ admin_header('Academy', $admin, 'academy');
 
     <nav class="tabs" aria-label="Filter by status">
 <?php foreach (['all' => 'All'] + ACADEMY_STATUSES as $key => $label): ?>
-      <a href="academy.php<?= $key === 'all' ? '' : '?status=' . e($key) ?>" class="tabs__tab" <?= $status === $key ? 'aria-current="page"' : '' ?>>
+      <a href="academy<?= $key === 'all' ? '' : '?status=' . e($key) ?>" class="tabs__tab" <?= $status === $key ? 'aria-current="page"' : '' ?>>
         <?= e($label) ?> <span class="tabs__count"><?= $counts[$key] ?></span>
       </a>
 <?php endforeach; ?>

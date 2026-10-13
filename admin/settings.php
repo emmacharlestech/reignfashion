@@ -15,7 +15,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     if (!$errors) {
         save_settings($clean);
         flash('Settings saved. The website shows the new details within a minute.');
-        redirect('settings.php');
+        redirect('settings');
     }
     $values = $clean;   // keep what was typed so nothing is lost
 }

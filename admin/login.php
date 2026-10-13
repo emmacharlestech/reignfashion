@@ -6,18 +6,19 @@ require __DIR__ . '/../backend/admin-layout.php';
 
 admin_headers();
 if (current_admin()) {
-    redirect('index.php');
+    redirect('./');
 }
 
 /** Only allow redirects back to our own admin pages. */
 function safe_next(string $next): string
 {
-    return preg_match('/^[a-z-]+\.php(\?[\w=&%.-]*)?$/', $next) ? $next : 'index.php';
+    if ($next === 'index' || $next === '') return './';
+    return preg_match('/^(\.\/|[a-z-]+)(\?[\w=&%.-]*)?$/', $next) ? $next : './';
 }
 
 $error = '';
 $email = '';
-$next  = safe_next((string) ($_GET['next'] ?? $_POST['next'] ?? 'index.php'));
+$next  = safe_next((string) ($_GET['next'] ?? $_POST['next'] ?? './'));
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     require_csrf();

@@ -56,7 +56,7 @@ function inbox_url(array $changes): string
     global $status, $q, $page;
     $params = array_filter(array_merge(['status' => $status, 'q' => $q, 'page' => $page], $changes),
         fn($v) => $v !== '' && $v !== 'all' && $v !== 1);
-    return 'index.php' . ($params ? '?' . http_build_query($params) : '');
+    return './' . ($params ? '?' . http_build_query($params) : '');
 }
 
 admin_header('Enquiries', $admin, 'inbox');
@@ -94,7 +94,7 @@ admin_header('Enquiries', $admin, 'inbox');
     <ul class="inbox">
 <?php foreach ($rows as $r): ?>
       <li class="inbox__item<?= $r['status'] === 'new' ? ' is-new' : '' ?>">
-        <a href="enquiry.php?id=<?= (int) $r['id'] ?>" class="inbox__link">
+        <a href="enquiry?id=<?= (int) $r['id'] ?>" class="inbox__link">
           <span class="inbox__main">
             <span class="inbox__name"><?= e($r['name']) ?></span>
             <span class="inbox__meta"><?= e(SERVICES[$r['service']] ?? $r['service']) ?>
