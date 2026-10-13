@@ -361,7 +361,83 @@
       status.textContent = filter === 'all'
         ? `Showing ${shown} ${noun}`
         : `Showing ${shown} ${noun} in ${labelFor(filter)}`;
+
+      fillGaps();
     }
+
+    /* ---- Gap filling ----
+       Tile shapes are fixed, so some combinations of visible designs leave
+       empty cells at the end of the grid. This counts empty cells and nudges
+       tiles (grow a standard tile to two rows, or shrink a tall one) until
+       the grid is complete. Runs after every filter and on resize. */
+    function countGaps() {
+      const items = getItems().filter((i) => !i.hidden);
+      if (!items.length) return 0;
+      const cs = getComputedStyle(grid);
+      const cols = cs.gridTemplateColumns.split(' ').length;
+      const rowH = parseFloat(cs.gridAutoRows);
+      const gap = parseFloat(cs.rowGap) || 0;
+      const top = grid.getBoundingClientRect().top;
+      const colW = (grid.clientWidth - gap * (cols - 1)) / cols;
+      let cells = 0;
+      let rows = 0;
+      items.forEach((i) => {
+        const b = i.getBoundingClientRect();
+        cells += Math.round((b.height + gap) / (rowH + gap)) * Math.round((b.width + gap) / (colW + gap));
+        rows = Math.max(rows, Math.round((b.bottom - top + gap) / (rowH + gap)));
+      });
+      return rows * cols - cells;
+    }
+
+    function fillGaps() {
+      grid.style.gridTemplateColumns = '';
+      const tune = () => {
+        getItems().forEach((i) => i.classList.remove('is-grown', 'is-shrunk'));
+        return adjustTiles();
+      };
+      let gaps = tune();
+      if (!gaps) return;
+
+      // Small sets (e.g. 3 bridal designs) can't fill 4 columns: try fewer
+      // columns and keep whichever arrangement leaves the fewest gaps.
+      const startCols = getComputedStyle(grid).gridTemplateColumns.split(' ').length;
+      let best = { cols: 0, gaps };
+      for (let cols = startCols - 1; cols >= 2 && best.gaps > 0; cols -= 1) {
+        grid.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+        const g = tune();
+        if (g < best.gaps) best = { cols, gaps: g };
+      }
+      grid.style.gridTemplateColumns = best.cols ? `repeat(${best.cols}, minmax(0, 1fr))` : '';
+      tune();
+    }
+
+    function adjustTiles() {
+      let gaps = countGaps();
+      if (!gaps) return 0;
+      const visible = () => getItems().filter((i) => !i.hidden);
+      // Try changes from the end of the grid backwards; keep any that reduce gaps
+      for (let attempt = 0; attempt < 12 && gaps > 0; attempt += 1) {
+        let improved = false;
+        for (const item of visible().reverse()) {
+          const isTall = item.classList.contains('g-item--tall') && !item.classList.contains('is-shrunk');
+          const isStd = !item.classList.contains('g-item--tall') && !item.classList.contains('g-item--wide') && !item.classList.contains('is-grown');
+          if (!isTall && !isStd) continue;
+          const cls = isTall ? 'is-shrunk' : 'is-grown';
+          item.classList.add(cls);
+          const next = countGaps();
+          if (next < gaps) { gaps = next; improved = true; break; }
+          item.classList.remove(cls);
+        }
+        if (!improved) break;
+      }
+      return gaps;
+    }
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(fillGaps, 200);
+    });
 
     buttons.forEach((btn) => btn.addEventListener('click', () => applyFilter(btn.dataset.filter)));
 

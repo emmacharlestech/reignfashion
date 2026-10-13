@@ -10,8 +10,6 @@ backend/storage/uploads/*
 assets/uploads/gallery/*
 !assets/uploads/gallery/index.html
 
-# --- Third-party photos we don't have rights to publish ----------------------
-assets/images/aso-ebi/
 
 # --- Local backups and OS/editor files ---------------------------------------
 tools/index.single-page.backup.html

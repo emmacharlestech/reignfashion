@@ -129,7 +129,7 @@ function seed_gallery_from_html(): int
     if ((int) db()->query('SELECT COUNT(*) FROM gallery_items')->fetchColumn() > 0) {
         return 0;
     }
-    $html = @file_get_contents(SITE_ROOT . '/index.html');
+    $html = @file_get_contents(SITE_ROOT . '/collections.html') ?: @file_get_contents(SITE_ROOT . '/index.html');
     if (!$html || !preg_match('/<ul class="gallery__grid"[^>]*>(.*?)<\/ul>/s', $html, $m)) {
         return 0;
     }

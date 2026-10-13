@@ -3206,6 +3206,12 @@ body.menu-open .wa-float { display: none; }
 }
 
 /* --------------------------------------------------------------------------
+   32. Gallery gap filling (classes set by fillGaps() in js/script.js)
+   -------------------------------------------------------------------------- */
+.gallery__grid .g-item.is-grown { grid-row: span 2; }
+.gallery__grid .g-item.is-shrunk { grid-row: span 1; }
+
+/* --------------------------------------------------------------------------
    22. Reduced motion
    -------------------------------------------------------------------------- */
 /* Motion is switched off outright (not shortened): a tiny duration would make
