@@ -1,0 +1,9 @@
+# Reign Fashion Empire
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
+Disallow: /backend/
+Disallow: /deploy/
+Disallow: /tools/
+
+Sitemap: https://reignfashionempire.com/sitemap.xml

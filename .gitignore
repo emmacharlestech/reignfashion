@@ -1,0 +1,22 @@
+# --- Secrets: never commit ---------------------------------------------------
+# Real settings (database password, app secret). Copy backend/config.example.php.
+backend/config.php
+# Deployment package: live config, live admin password, database export
+deploy/
+
+# --- Customer and admin uploads (personal data / generated files) ------------
+backend/storage/uploads/*
+!backend/storage/uploads/index.html
+assets/uploads/gallery/*
+!assets/uploads/gallery/index.html
+
+# --- Third-party photos we don't have rights to publish ----------------------
+assets/images/aso-ebi/
+
+# --- Local backups and OS/editor files ---------------------------------------
+tools/index.single-page.backup.html
+*.bak
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

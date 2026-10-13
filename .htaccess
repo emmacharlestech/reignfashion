@@ -1,0 +1,61 @@
+# Reign Fashion Empire — site-wide rules (Apache / LiteSpeed)
+
+# No folder listings anywhere
+Options -Indexes
+DirectoryIndex index.html index.php
+
+# Never serve docs, database files, configs or hidden files
+<FilesMatch "(?i)(\.(md|sql|log|ini|bak|zip|example\.php)|^\..*)$">
+  Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Live site only: force HTTPS and the bare domain (localhost is unaffected)
+  RewriteCond %{HTTP_HOST} ^(www\.)?reignfashionempire\.com$ [NC]
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^ https://reignfashionempire.com%{REQUEST_URI} [L,R=301]
+
+  RewriteCond %{HTTP_HOST} ^www\.reignfashionempire\.com$ [NC]
+  RewriteRule ^ https://reignfashionempire.com%{REQUEST_URI} [L,R=301]
+
+  # Clean page addresses: /collections serves collections.html
+  # 1. Old links: /index.html -> /   and   /bridal.html -> /bridal  (permanent)
+  RewriteCond %{THE_REQUEST} \s(/[^?\s]*/)?index\.html[?\s]
+  RewriteRule ^ %1 [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s(/[^?\s]+)\.html[?\s]
+  RewriteRule ^ %1 [R=301,L,NE]
+  # 2. A trailing slash on a page (/bridal/) -> /bridal
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_URI} ^(.+)/$
+  RewriteRule ^ %1 [R=301,L]
+  # 3. Serve the matching .html file for a clean address
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME}.html -f
+  RewriteRule ^(.+)$ $1.html [L]
+</IfModule>
+
+# Basic security headers for the public site
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+</IfModule>
+
+# Compress text files (HTML/CSS/JS/JSON/SVG/XML): roughly 75% smaller downloads.
+# LiteSpeed hosting also compresses automatically; these rules cover Apache hosts.
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/javascript application/json application/xml image/svg+xml
+</IfModule>
+
+# Cache static assets (CSS/JS/images/fonts) for a week
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 7 days"
+  ExpiresByType application/javascript "access plus 7 days"
+  ExpiresByType image/webp "access plus 30 days"
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType image/jpeg "access plus 30 days"
+</IfModule>

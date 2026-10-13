@@ -1,0 +1,12 @@
+# Uploaded files: only images are ever served, nothing can execute.
+Options -Indexes
+Require all denied
+<FilesMatch "(?i)\.(jpe?g|png|webp)$">
+  Require all granted
+</FilesMatch>
+<IfModule mod_php.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+  php_flag engine off
+</IfModule>
