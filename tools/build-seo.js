@@ -21,7 +21,11 @@ const BUSINESS = {
   region: 'Delta State',
   country: 'NG',
   openingHours: [],   // e.g. ['Mo-Sa 09:00-18:00'] once confirmed
-  sameAs: [],         // full profile URLs (Instagram, Facebook, TikTok) once confirmed
+  sameAs: [
+    'https://www.instagram.com/reign_fashion_empire/',
+    'https://www.facebook.com/Reign-Fashion-Empire',
+    'https://www.tiktok.com/@reignfashionacademy'
+  ],
 };
 
 const ROOT = path.join(__dirname, '..');  // tools/ sits in the site root

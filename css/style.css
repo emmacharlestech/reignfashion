@@ -756,10 +756,20 @@ body.menu-open .wordmark:focus-visible { outline-color: var(--c-gold); }
   aspect-ratio: 1 / 1.08;
 }
 
-.hero__img { position: absolute; margin: 0; }
-.hero__img .img-slot { width: 100%; }
+.hero__img {
+  position: absolute;
+  margin: 0;
+}
+.hero__img .img-slot {
+  width: 100%;
+}
 
-.hero__img--main { top: 0; right: 0; width: 66%; }
+.hero__img--main {
+  top: 0;
+  right: 0;
+  width: 66%;
+  z-index: 1;
+}
 
 /* Ivory "mat" (padding) separates the overlapping men's image from the women's */
 .hero__img--overlap {
@@ -770,9 +780,43 @@ body.menu-open .wordmark:focus-visible { outline-color: var(--c-gold); }
   padding: var(--mat);
   background: var(--c-ivory);
   z-index: 2;
+  transition: translate var(--dur-normal) var(--ease),
+              box-shadow var(--dur-normal) var(--ease),
+              z-index 0s;
 }
 
-.hero__img--small { top: 3%; left: 0; width: 30%; }
+.hero__img--overlap:hover {
+  translate: 0 -8px;
+  z-index: 5;
+}
+.hero__img--overlap:hover .img-slot {
+  box-shadow: 0 20px 42px -10px rgba(2, 28, 20, 0.65),
+              0 0 24px rgba(212, 167, 107, 0.32);
+}
+.hero__img--overlap:hover img {
+  transform: scale(1.06);
+  filter: brightness(1.04);
+}
+
+.hero__img--small {
+  top: 3%;
+  left: 0;
+  width: 30%;
+  z-index: 1;
+}
+
+.hero__img--small:hover {
+  translate: 0 -6px;
+  z-index: 4;
+}
+.hero__img--small:hover .img-slot {
+  box-shadow: 0 16px 32px -8px rgba(2, 28, 20, 0.55),
+              0 0 20px rgba(212, 167, 107, 0.32);
+}
+.hero__img--small:hover img {
+  transform: scale(1.07);
+  filter: brightness(1.03);
+}
 
 /* Small slots: compact placeholder label */
 .hero__img--small .img-slot::after,
@@ -2108,21 +2152,67 @@ body.menu-open .wordmark:focus-visible { outline-color: var(--c-gold); }
 
 .social__list {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
-  gap: var(--space-2) var(--space-5);
-  margin-top: var(--space-2);
+  gap: 0.75rem;
+  margin-top: var(--space-3);
+  padding: 0;
+  list-style: none;
 }
-.social__list a,
-.social__list span {
+.social-link {
   display: inline-flex;
   align-items: center;
-  min-height: 32px;
-  font-size: var(--fs-sm);
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(212, 167, 107, 0.45);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--c-gold);
+  text-decoration: none;
+  transition: transform var(--dur-fast) var(--ease),
+              background var(--dur-fast) var(--ease),
+              color var(--dur-fast) var(--ease),
+              border-color var(--dur-fast) var(--ease),
+              box-shadow var(--dur-fast) var(--ease);
 }
-.social__list a {
-  border-bottom: 1px solid var(--c-gold);
+.social-link:hover,
+.social-link:focus-visible {
+  transform: translateY(-2px) scale(1.08);
+  background: var(--c-gold);
+  color: var(--c-green-deepest);
+  border-color: var(--c-gold);
+  box-shadow: 0 4px 16px rgba(212, 167, 107, 0.4);
+  outline: none;
 }
-.social__list a:hover { color: var(--c-gold-deep); }
+.social-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+  transition: transform var(--dur-fast) var(--ease);
+}
+.social-link:hover .social-icon {
+  transform: scale(1.08);
+}
+/* When displayed in the dark footer */
+.site-footer .social-link {
+  border-color: rgba(212, 167, 107, 0.45);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--c-gold);
+}
+/* When displayed on light surfaces (e.g. Contact page) */
+.contact__info .social-link {
+  border-color: rgba(11, 59, 44, 0.25);
+  background: rgba(11, 59, 44, 0.04);
+  color: var(--c-green);
+}
+.contact__info .social-link:hover,
+.contact__info .social-link:focus-visible {
+  background: var(--c-green);
+  color: var(--c-gold);
+  border-color: var(--c-green);
+  box-shadow: 0 4px 16px rgba(11, 59, 44, 0.25);
+}
 
 /* --- Enquiry form --- */
 .contact__form-wrap {

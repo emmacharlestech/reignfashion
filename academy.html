@@ -161,7 +161,8 @@
           </div>
 
           <div class="btn-row reveal" style="--d: 300ms">
-            <a href="contact?service=academy" class="btn btn--dark" data-service="academy">Enquire About Training</a>
+            <a href="#register" class="btn btn--gold">Register for the Academy</a>
+            <a href="contact?service=academy" class="btn btn--dark" data-service="academy">Enquire via Contact</a>
           </div>
         </div>
 
@@ -194,6 +195,85 @@
           </div>
         </div>
 
+      </div>
+    </section>
+
+    <!-- ============================================================
+         ACADEMY REGISTRATION FORM
+         ============================================================ -->
+    <section id="register" class="section section--champagne reg" aria-labelledby="reg-title">
+      <div class="container">
+        <header class="section-head section-head--center">
+          <p class="eyebrow reveal">Join the Academy</p>
+          <h2 id="reg-title" class="h2 reveal" style="--d: 80ms">Enrol in the <em>Academy</em></h2>
+          <p class="lead reveal" style="--d: 160ms">Professional fashion design training in Asaba, from fundamentals to advanced couture and bridal gown production.</p>
+        </header>
+
+        <div class="reg__grid">
+          <div class="reg-card reg-card--form reveal" style="--d: 120ms; max-width: 680px; margin: 0 auto; width: 100%;">
+            <h3 class="reg-card__title">Register Your <em>Interest</em></h3>
+            <p class="reg-card__text">Fill in your details and the Academy team will contact you about classes, fees and the next intake.</p>
+
+            <form class="reg-form" id="academy-form" novalidate>
+              <div class="field">
+                <label for="a-name">Full name <span class="req" aria-hidden="true">*</span></label>
+                <input id="a-name" name="name" type="text" autocomplete="name" required aria-describedby="a-name-err">
+                <p class="field__error" id="a-name-err"></p>
+              </div>
+              <div class="reg-form__row">
+                <div class="field">
+                  <label for="a-email">Email <span class="req" aria-hidden="true">*</span></label>
+                  <input id="a-email" name="email" type="email" autocomplete="email" inputmode="email" required aria-describedby="a-email-err">
+                  <p class="field__error" id="a-email-err"></p>
+                </div>
+                <div class="field">
+                  <label for="a-phone">Phone / WhatsApp <span class="req" aria-hidden="true">*</span></label>
+                  <input id="a-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required aria-describedby="a-phone-err">
+                  <p class="field__error" id="a-phone-err"></p>
+                </div>
+              </div>
+              <div class="field">
+                <label for="a-level">Level <span class="req" aria-hidden="true">*</span></label>
+                <div class="select-wrap">
+                  <select id="a-level" name="level" required aria-describedby="a-level-err">
+                    <option value="">Choose your level</option>
+                    <option value="beginner">Beginner: I'm new to sewing</option>
+                    <option value="intermediate">Intermediate: I can sew basic garments</option>
+                    <option value="advanced">Advanced: I make full outfits</option>
+                    <option value="professional">Professional Mastery</option>
+                  </select>
+                </div>
+                <p class="field__error" id="a-level-err"></p>
+              </div>
+              <fieldset class="field field--choice" aria-describedby="a-schedule-err">
+                <legend>Preferred class days <span class="req" aria-hidden="true">*</span></legend>
+                <div class="choices">
+                  <label class="choice"><input type="radio" name="schedule" value="weekdays" required> Weekdays</label>
+                  <label class="choice"><input type="radio" name="schedule" value="weekends"> Weekends</label>
+                  <label class="choice"><input type="radio" name="schedule" value="either"> Either</label>
+                </div>
+                <p class="field__error" id="a-schedule-err"></p>
+              </fieldset>
+              <div class="field">
+                <label for="a-experience">Your experience or goals <span class="field__optional">(optional)</span></label>
+                <textarea id="a-experience" name="experience" rows="3" maxlength="1500"></textarea>
+              </div>
+              <div class="field field--consent">
+                <label class="choice choice--consent">
+                  <input type="checkbox" name="consent" value="yes" required aria-describedby="a-consent-err">
+                  <span>I agree that Reign Fashion may use these details to contact me about the Academy, as described in the <a href="privacy" target="_blank" rel="noopener">Privacy Policy</a>. <span class="req" aria-hidden="true">*</span></span>
+                </label>
+                <p class="field__error" id="a-consent-err"></p>
+              </div>
+              <div class="hp" aria-hidden="true">
+                <label for="a-website">Leave this field empty</label>
+                <input id="a-website" name="website" type="text" tabindex="-1" autocomplete="off">
+              </div>
+              <button type="submit" class="btn btn--dark reg-form__submit">Register</button>
+              <div class="form-status" id="academy-status" role="status" aria-live="polite" tabindex="-1" hidden></div>
+            </form>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -270,7 +350,26 @@
             <li><span class="footer__label">Hours</span><span data-contact="hours">To be confirmed</span></li>
           </ul>
           <h3 class="footer__heading footer__heading--follow">Follow</h3>
-          <ul class="social__list footer__social" data-contact="social"></ul>
+          <ul class="social__list footer__social" data-contact="social">
+            <li>
+              <a href="https://www.instagram.com/reign_fashion_empire/" target="_blank" rel="noopener noreferrer" class="social-link social-link--instagram" aria-label="Instagram: @Reign-Fashion-Empire (opens in a new tab)" title="Instagram: @Reign-Fashion-Empire">
+                <svg class="social-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+                <span class="visually-hidden">Instagram</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.facebook.com/Reign-Fashion-Empire" target="_blank" rel="noopener noreferrer" class="social-link social-link--facebook" aria-label="Facebook: @Reign-Fashion-Empire (opens in a new tab)" title="Facebook: @Reign-Fashion-Empire">
+                <svg class="social-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" focusable="false"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                <span class="visually-hidden">Facebook</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.tiktok.com/@reignfashionacademy" target="_blank" rel="noopener noreferrer" class="social-link social-link--tiktok" aria-label="TikTok: @#Reign-Fashion-Academy Asaba (opens in a new tab)" title="TikTok: @#Reign-Fashion-Academy Asaba">
+                <svg class="social-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" focusable="false"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.298-.002.595.042.88.13V9.4a6.33 6.33 0 0 0-1-.08A6.34 6.34 0 0 0 3 15.66a6.34 6.34 0 0 0 10.86 4.43c.03-.03.06-.06.09-.09V11.8a8.16 8.16 0 0 0 5.64 2.2V10.5a4.88 4.88 0 0 1-3-1.07 4.78 4.78 0 0 1-1.46-2.74h-.01z"/></svg>
+                <span class="visually-hidden">TikTok</span>
+              </a>
+            </li>
+          </ul>
         </div>
       </div>
 

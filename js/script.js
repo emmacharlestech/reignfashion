@@ -29,9 +29,9 @@
     // For each network: `url` is the full profile link (makes it clickable);
     // `name` is the account name shown as plain text until the link is known.
     social: {
-      instagram: { url: '', name: 'Reign Fashion Empire' },
-      facebook:  { url: '', name: 'Reign Fashion Empire' },
-      tiktok:    { url: '', name: 'Reign Fashion Academy Asaba' },
+      instagram: { url: 'https://www.instagram.com/reign_fashion_empire/', name: '@Reign-Fashion-Empire' },
+      facebook:  { url: 'https://www.facebook.com/Reign-Fashion-Empire',  name: '@Reign-Fashion-Empire' },
+      tiktok:    { url: 'https://www.tiktok.com/@reignfashionacademy',    name: '@#Reign-Fashion-Academy Asaba' },
     },
     // Academy schedule & fees (empty = "To be confirmed")
     academy: { duration: '', fees: '', intake: '' },
@@ -715,16 +715,31 @@
       hours: () => (hours ? el('span', {}, hours) : pending()),
       social: () => {
         const frag = document.createDocumentFragment();
+        const ICONS = {
+          instagram: '<svg class="social-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>',
+          facebook: '<svg class="social-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" focusable="false"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>',
+          tiktok: '<svg class="social-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" focusable="false"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.298-.002.595.042.88.13V9.4a6.33 6.33 0 0 0-1-.08A6.34 6.34 0 0 0 3 15.66a6.34 6.34 0 0 0 10.86 4.43c.03-.03.06-.06.09-.09V11.8a8.16 8.16 0 0 0 5.64 2.2V10.5a4.88 4.88 0 0 1-3-1.07 4.78 4.78 0 0 1-1.46-2.74h-.01z"/></svg>',
+        };
         [['instagram', 'Instagram'], ['facebook', 'Facebook'], ['tiktok', 'TikTok']].forEach(([key, label]) => {
           const li = el('li');
           const { url = '', name = '' } = social?.[key] ?? {};
+          const handleLabel = name ? `${label}: ${name}` : label;
           if (url) {
-            const a = el('a', { href: url, target: '_blank', rel: 'noopener' }, label);
-            if (name) a.setAttribute('aria-label', `${label}: ${name} (opens in a new tab)`);
+            const a = el('a', {
+              href: url,
+              target: '_blank',
+              rel: 'noopener noreferrer',
+              className: `social-link social-link--${key}`,
+            });
+            a.setAttribute('aria-label', `${handleLabel} (opens in a new tab)`);
+            a.setAttribute('title', handleLabel);
+            a.innerHTML = `${ICONS[key]}<span class="visually-hidden">${label}</span>`;
             li.append(a);
           } else if (name) {
-            // Account name known, profile link not yet: show as plain text, never a guessed URL
-            li.append(el('span', { className: 'social__name' }, `${label}: ${name}`));
+            const span = el('span', { className: `social-link social-link--${key} is-pending` });
+            span.setAttribute('title', handleLabel);
+            span.innerHTML = `${ICONS[key]}<span class="visually-hidden">${handleLabel}</span>`;
+            li.append(span);
           } else {
             li.append(pending(`${label} (link to be added)`));
           }
