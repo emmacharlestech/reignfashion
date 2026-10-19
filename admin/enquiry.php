@@ -13,7 +13,7 @@ $enq = $stmt->fetch();
 if (!$enq) {
     http_response_code(404);
     admin_header('Not found', $admin, 'inbox');
-    echo '<div class="empty"><p class="empty__title">That enquiry no longer exists.</p><p><a class="btn" href="./">Back to enquiries</a></p></div>';
+    echo '<div class="empty"><p class="empty__title">That enquiry no longer exists.</p><p><a class="btn" href="enquiries">Back to enquiries</a></p></div>';
     admin_footer();
     exit;
 }
@@ -47,7 +47,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         }
         db()->prepare('DELETE FROM enquiries WHERE id = ?')->execute([$id]);   // files rows cascade
         flash("Enquiry {$enq['ref']} deleted.");
-        redirect('./');
+        redirect('enquiries');
     }
 
     flash('Unknown action.', 'error');
@@ -67,7 +67,7 @@ $mailSubject = "Your Reign Fashion enquiry {$enq['ref']}";
 
 admin_header($enq['ref'] . ' · ' . $enq['name'], $admin, 'inbox');
 ?>
-    <p class="crumbs"><a href="./">← All enquiries</a></p>
+    <p class="crumbs"><a href="enquiries">← All enquiries</a></p>
 
     <div class="page__head">
       <div>
@@ -114,6 +114,13 @@ admin_header($enq['ref'] . ' · ' . $enq['name'], $admin, 'inbox');
             <a class="btn btn--block" href="tel:<?= e(preg_replace('/[^\d+]/', '', $enq['phone'])) ?>">Call <?= e($enq['phone']) ?></a>
 <?php endif; ?>
             <a class="btn btn--block" href="mailto:<?= e($enq['email']) ?>?subject=<?= e(rawurlencode($mailSubject)) ?>">Email <?= e($firstName) ?></a>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="pay-h">
+          <h2 id="pay-h" class="card__title">Payment details</h2>
+          <div class="stack">
+            <?php payment_buttons($enq['ref'], $wa, $enq['email'], $firstName); ?>
           </div>
         </section>
 

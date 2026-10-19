@@ -1,26 +1,17 @@
 <?php
 /**
- * One-click live gallery database synchronization.
- * Updates all 29 authentic designs into gallery_items.
- *
- * Usage:
- *   https://reignfashionempire.com/api/sync-gallery.php?key=reign2026
+ * Replace gallery_items with the 29 designs listed below.
+ * Command line only (tools/ is blocked from the web by .htaccess):
+ *   php tools/sync-gallery.php
  */
 declare(strict_types=1);
 
-require_once __DIR__ . '/../backend/gallery.php';
-
-header('Content-Type: application/json; charset=utf-8');
-
-$key = $_GET['key'] ?? '';
-$config = config();
-$validKey = ($key === 'reign2026' || $key === ($config['app_secret'] ?? ''));
-
-if (!$validKey) {
-    http_response_code(403);
-    echo json_encode(['ok' => false, 'error' => 'Invalid or missing synchronization key. Use ?key=reign2026']);
+if (PHP_SAPI !== 'cli') {
+    http_response_code(404);
     exit;
 }
+
+require_once __DIR__ . '/../backend/gallery.php';
 
 try {
     $pdo = db();
@@ -66,12 +57,8 @@ try {
         $ins->execute($row);
     }
 
-    echo json_encode([
-        'ok' => true,
-        'message' => 'Successfully synchronized all 29 designs into gallery_items!',
-        'count' => count($items)
-    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    echo 'Synchronised ' . count($items) . " designs into gallery_items.\n";
 } catch (Throwable $e) {
-    http_response_code(500);
-    echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+    fwrite(STDERR, 'Gallery sync failed: ' . $e->getMessage() . "\n");
+    exit(1);
 }

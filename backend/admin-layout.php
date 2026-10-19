@@ -4,6 +4,28 @@
  */
 declare(strict_types=1);
 
+require_once __DIR__ . '/settings.php';
+
+/**
+ * "Send payment details" buttons for one customer: WhatsApp (if a number),
+ * email and copy. Points to Settings when no bank account is saved yet.
+ */
+function payment_buttons(string $ref, string $waDigits, string $email, string $firstName, bool $compact = false): void
+{
+    $text = payment_message($ref);
+    $btn = $compact ? 'btn btn--sm' : 'btn btn--block';
+    if ($text === '') {
+        echo '<p class="hint">Add your bank details in <a href="settings#g-payment">Settings → Payment</a> to send them from here.</p>';
+        return;
+    }
+    $greeting = "Hello $firstName,\n\n";
+    if ($waDigits !== '') {
+        echo '<a class="' . $btn . '" href="https://wa.me/' . e($waDigits) . '?text=' . e(rawurlencode($greeting . $text)) . '" target="_blank" rel="noopener">Send on WhatsApp</a>';
+    }
+    echo '<a class="' . $btn . '" href="mailto:' . e($email) . '?subject=' . e(rawurlencode("Payment details · $ref")) . '&amp;body=' . e(rawurlencode($greeting . $text)) . '">Send by email</a>';
+    echo '<button type="button" class="' . $btn . '" data-copy="' . e($text) . '">Copy details</button>';
+}
+
 function admin_header(string $title, ?array $admin = null, string $active = ''): void
 {
     $flash = $admin ? flash() : null;
@@ -32,7 +54,8 @@ function admin_header(string $title, ?array $admin = null, string $active = ''):
       <span class="topbar__toggle-label">Menu</span>
     </button>
     <nav class="topbar__nav" id="admin-nav" aria-label="Admin">
-      <a href="./" <?= $active === 'inbox' ? 'aria-current="page"' : '' ?>>Enquiries</a>
+      <a href="./" <?= $active === 'dashboard' ? 'aria-current="page"' : '' ?>>Dashboard</a>
+      <a href="enquiries" <?= $active === 'inbox' ? 'aria-current="page"' : '' ?>>Enquiries</a>
       <a href="academy" <?= $active === 'academy' ? 'aria-current="page"' : '' ?>>Academy</a>
       <a href="gallery" <?= $active === 'gallery' ? 'aria-current="page"' : '' ?>>Gallery</a>
       <a href="testimonials" <?= $active === 'testimonials' ? 'aria-current="page"' : '' ?>>Testimonials</a>

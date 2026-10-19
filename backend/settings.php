@@ -9,7 +9,8 @@ require_once __DIR__ . '/bootstrap.php';
 
 /**
  * key => [group, label, type, default, max length, help]
- * Types: text, phone, email, url:<domain|domain>, textarea
+ * Types: text, phone, email, url:<domain|domain>, textarea, account (10-digit NUBAN),
+ *        choices:<key=Label|…> (tick boxes, saved comma-separated), select:<key=Label|…>
  */
 const SETTING_DEFS = [
     // Contact
@@ -30,13 +31,39 @@ const SETTING_DEFS = [
     'academy_duration'=> ['academy', 'Course duration', 'text', '', 120, 'e.g. 3 months (Beginner) to 12 months (Professional Mastery)'],
     'academy_fees'    => ['academy', 'Fees', 'text', '', 120, 'e.g. From ₦150,000, or "Available on enquiry"'],
     'academy_intake'  => ['academy', 'Next intake', 'text', '', 120, 'e.g. January 2027, or "Ongoing enrolment"'],
+    // Payment
+    'payment_methods' => ['payment', 'Ways customers can pay', 'choices:transfer=Bank transfer|cash=Cash at the studio|pos=Card / POS at the studio', 'transfer,cash,pos', 60, 'Tick every option you accept. Shown on the Contact page.'],
+    'payment_terms'   => ['payment', 'Payment terms', 'textarea', '', 300, 'e.g. A 50% deposit confirms your order; the balance is paid before collection.'],
+    'bank_1_bank'     => ['payment', 'Account 1: bank', 'text', '', 60, 'e.g. Access Bank, GTBank, Moniepoint, OPay'],
+    'bank_1_name'     => ['payment', 'Account 1: account name', 'text', '', 100, 'Exactly as the bank shows it, so customers can check before paying.'],
+    'bank_1_number'   => ['payment', 'Account 1: account number', 'account', '', 10, '10 digits.'],
+    'bank_2_bank'     => ['payment', 'Account 2: bank (optional)', 'text', '', 60, 'A second account, e.g. for Academy fees.'],
+    'bank_2_name'     => ['payment', 'Account 2: account name', 'text', '', 100, ''],
+    'bank_2_number'   => ['payment', 'Account 2: account number', 'account', '', 10, '10 digits.'],
+    'bank_display'    => ['payment', 'Where bank details appear', 'select:public=On the website (Contact page) and in the admin|private=Only in the admin, for sending to customers yourself', 'public', 10, 'Either way, each enquiry and registration has a button to send the details on WhatsApp.'],
+    // Email alerts
+    'alerts'          => ['alerts', 'Email alerts', 'select:on=Email me about every new enquiry and registration|off=No emails: I check the admin myself', 'on', 10, ''],
+    'alert_email'     => ['alerts', 'Send alerts to', 'email', '', 200, 'Leave empty to use the business email above.'],
 ];
 
 const SETTING_GROUPS = [
     'contact' => 'Contact details',
     'social'  => 'Social media',
     'academy' => 'Reign Fashion Academy',
+    'payment' => 'Payment',
+    'alerts'  => 'Email alerts',
 ];
+
+/** Parse "key=Label|key=Label" from a choices:/select: type. */
+function setting_options(string $type): array
+{
+    $options = [];
+    foreach (explode('|', substr($type, strpos($type, ':') + 1)) as $pair) {
+        [$k, $label] = explode('=', $pair, 2);
+        $options[$k] = $label;
+    }
+    return $options;
+}
 
 /** All settings, with defaults for anything not yet saved. */
 function get_settings(): array
@@ -72,16 +99,33 @@ function validate_settings(array $input): array
     $clean = [];
     $errors = [];
     foreach (SETTING_DEFS as $key => [$group, $label, $type, $default, $max]) {
+        if (str_starts_with($type, 'choices:')) {
+            $picked = is_array($input[$key] ?? null) ? $input[$key] : [];
+            $clean[$key] = implode(',', array_keys(array_intersect_key(setting_options($type), array_flip($picked))));
+            continue;
+        }
+        if (str_starts_with($type, 'select:')) {
+            $value = is_string($input[$key] ?? null) ? $input[$key] : '';
+            $clean[$key] = isset(setting_options($type)[$value]) ? $value : $default;
+            continue;
+        }
         $raw = $type === 'textarea'
             ? preg_replace('/\s+/', ' ', clean_text($input[$key] ?? '', $max)) ?? ''
-            : clean_line($input[$key] ?? '', $max);
+            : clean_line($input[$key] ?? '', $type === 'account' ? 20 : $max);   // room for spaces, stripped below
         $raw = trim($raw);
+        if ($type === 'account') {
+            $raw = preg_replace('/[\s-]+/', '', $raw) ?? '';   // "0123 456 789" → "0123456789"
+        }
         $clean[$key] = $raw;
         if ($raw === '') {
             continue;                              // every setting may be left empty
         }
 
-        if ($type === 'phone') {
+        if ($type === 'account') {
+            if (!preg_match('/^\d{10}$/', $raw)) {
+                $errors[$key] = "$label must be exactly 10 digits.";
+            }
+        } elseif ($type === 'phone') {
             $digits = phone_international($raw);
             if (!preg_match('/^\+?[\d\s().-]+$/', $raw) || strlen($digits) < 8 || strlen($digits) > 15) {
                 $errors[$key] = "$label doesn't look like a valid phone number.";
@@ -102,7 +146,68 @@ function validate_settings(array $input): array
             }
         }
     }
+
+    // A bank account is all-or-nothing: a half-filled one would send money astray.
+    foreach ([1, 2] as $n) {
+        $parts = ["bank_{$n}_bank", "bank_{$n}_name", "bank_{$n}_number"];
+        $filled = array_filter($parts, fn($k) => $clean[$k] !== '');
+        if ($filled && count($filled) < 3) {
+            foreach (array_diff($parts, $filled) as $k) {
+                $errors[$k] ??= "Please fill in the bank, account name and account number for account $n (or clear all three).";
+            }
+        }
+    }
     return [$clean, $errors];
+}
+
+/** Complete bank accounts, in order: [['bank' =>, 'name' =>, 'number' =>], …] */
+function bank_accounts(?array $s = null): array
+{
+    $s ??= get_settings();
+    $accounts = [];
+    foreach ([1, 2] as $n) {
+        $a = ['bank' => $s["bank_{$n}_bank"], 'name' => $s["bank_{$n}_name"], 'number' => $s["bank_{$n}_number"]];
+        if ($a['bank'] !== '' && $a['name'] !== '' && $a['number'] !== '') {
+            $accounts[] = $a;
+        }
+    }
+    return $accounts;
+}
+
+/** Labels of the payment methods the owner ticked. */
+function payment_method_labels(?array $s = null): array
+{
+    $s ??= get_settings();
+    $options = setting_options(SETTING_DEFS['payment_methods'][2]);
+    $picked = array_filter(explode(',', $s['payment_methods']));
+    return array_values(array_intersect_key($options, array_flip($picked)));
+}
+
+/**
+ * Plain-text payment details for the admin to send a customer (WhatsApp/email).
+ * Returns '' when no bank account has been saved yet.
+ */
+function payment_message(string $ref = ''): string
+{
+    $s = get_settings();
+    $accounts = bank_accounts($s);
+    if (!$accounts) {
+        return '';
+    }
+    $lines = ['Payment details for Reign Fashion Empire:'];
+    foreach ($accounts as $a) {
+        $lines[] = '';
+        $lines[] = "Bank: {$a['bank']}";
+        $lines[] = "Account name: {$a['name']}";
+        $lines[] = "Account number: {$a['number']}";
+    }
+    if ($s['payment_terms'] !== '') {
+        $lines[] = '';
+        $lines[] = $s['payment_terms'];
+    }
+    $lines[] = '';
+    $lines[] = 'Please send your proof of payment here' . ($ref !== '' ? " with your reference $ref" : '') . '. Thank you!';
+    return implode("\n", $lines);
 }
 
 function save_settings(array $clean): void
@@ -138,6 +243,13 @@ function public_settings(): array
             'duration' => $s['academy_duration'],
             'fees'     => $s['academy_fees'],
             'intake'   => $s['academy_intake'],
+        ],
+        // Bank details only when the owner chose to publish them and accepts transfers
+        'payment' => [
+            'methods'  => payment_method_labels($s),
+            'terms'    => $s['payment_terms'],
+            'accounts' => $s['bank_display'] === 'public' && in_array('transfer', explode(',', $s['payment_methods']), true)
+                ? bank_accounts($s) : [],
         ],
     ];
 }

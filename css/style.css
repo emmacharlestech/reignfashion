@@ -2128,6 +2128,12 @@ body.menu-open .wordmark:focus-visible { outline-color: var(--c-gold); }
 /* Phone lines, WhatsApp tag, directions link (filled by script) */
 .contact-phone { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); }
 .contact-phone + .contact-phone { margin-top: 2px; }
+
+/* Payment: bank accounts and terms (filled by script) */
+.contact-bank { display: flex; flex-direction: column; margin-top: var(--space-2); padding-left: var(--space-3); border-left: 2px solid var(--c-gold); }
+.contact-bank strong { color: var(--c-ink); font-weight: 600; }
+.contact-bank__number { font-variant-numeric: tabular-nums; letter-spacing: 0.06em; font-weight: 600; color: var(--c-ink); }
+.contact-pay-note { margin-top: var(--space-2); font-size: 0.875rem; color: var(--c-ink-muted); }
 .contact-phone__tag {
   padding: 0 6px;
   border: 1px solid currentColor;

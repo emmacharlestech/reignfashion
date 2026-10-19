@@ -2,122 +2,123 @@
 declare(strict_types=1);
 
 require __DIR__ . '/../backend/auth.php';
+require __DIR__ . '/../backend/academy.php';
+require __DIR__ . '/../backend/notify.php';
 require __DIR__ . '/../backend/admin-layout.php';
 
 $admin = require_admin();
+$pdo = db();
+$num = fn(string $sql) => (int) $pdo->query($sql)->fetchColumn();
 
-const PER_PAGE = 20;
+$stats = [
+    ['New enquiries', $num("SELECT COUNT(*) FROM enquiries WHERE status = 'new'"), 'enquiries?status=new', 'waiting for a reply'],
+    ['New Academy registrations', $num("SELECT COUNT(*) FROM academy_registrations WHERE status = 'new'"), 'academy?status=new', 'waiting for a reply'],
+    ['Enquiries this month', $num("SELECT COUNT(*) FROM enquiries WHERE created_at >= DATE_FORMAT(CURDATE(), '%Y-%m-01')"), 'enquiries', date('F Y')],
+    ['Students enrolled', $num("SELECT COUNT(*) FROM academy_registrations WHERE status = 'enrolled'"), 'academy?status=enrolled', 'in total'],
+];
 
-$status = (string) ($_GET['status'] ?? 'all');
-if ($status !== 'all' && !isset(STATUSES[$status])) {
-    $status = 'all';
-}
-$q    = clean_line($_GET['q'] ?? '', 100);
-$page = max(1, (int) ($_GET['page'] ?? 1));
+$upcoming = $pdo->query("SELECT id, ref, name, service, event_date, status FROM enquiries
+    WHERE event_date BETWEEN CURDATE() AND CURDATE() + INTERVAL 30 DAY AND status <> 'closed'
+    ORDER BY event_date, id LIMIT 8")->fetchAll();
+$latestEnq = $pdo->query('SELECT id, ref, name, service, status, created_at FROM enquiries ORDER BY created_at DESC, id DESC LIMIT 5')->fetchAll();
+$latestReg = $pdo->query('SELECT id, ref, name, level, status, created_at FROM academy_registrations ORDER BY created_at DESC, id DESC LIMIT 5')->fetchAll();
 
-// Counts for the tabs
-$counts = ['all' => 0] + array_fill_keys(array_keys(STATUSES), 0);
-foreach (db()->query('SELECT status, COUNT(*) n FROM enquiries GROUP BY status') as $row) {
-    $counts[$row['status']] = (int) $row['n'];
-    $counts['all'] += (int) $row['n'];
-}
-
-// Filtered list
-$where = [];
-$args  = [];
-if ($status !== 'all') {
-    $where[] = 'e.status = ?';
-    $args[]  = $status;
-}
-if ($q !== '') {
-    $where[] = '(e.name LIKE ? OR e.email LIKE ? OR e.phone LIKE ? OR e.ref LIKE ?)';
-    $like = '%' . addcslashes($q, '%_\\') . '%';
-    array_push($args, $like, $like, $like, $like);
-}
-$whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
-
-$countStmt = db()->prepare("SELECT COUNT(*) FROM enquiries e $whereSql");
-$countStmt->execute($args);
-$total = (int) $countStmt->fetchColumn();
-$pages = max(1, (int) ceil($total / PER_PAGE));
-$page  = min($page, $pages);
-
-$listStmt = db()->prepare("SELECT e.id, e.ref, e.name, e.service, e.contact_method, e.event_date, e.status, e.created_at,
-        (SELECT COUNT(*) FROM enquiry_files f WHERE f.enquiry_id = e.id) AS files
-    FROM enquiries e $whereSql
-    ORDER BY e.created_at DESC, e.id DESC
-    LIMIT " . PER_PAGE . ' OFFSET ' . (($page - 1) * PER_PAGE));
-$listStmt->execute($args);
-$rows = $listStmt->fetchAll();
-
-/** Build an inbox URL keeping the current filters. */
-function inbox_url(array $changes): string
-{
-    global $status, $q, $page;
-    $params = array_filter(array_merge(['status' => $status, 'q' => $q, 'page' => $page], $changes),
-        fn($v) => $v !== '' && $v !== 'all' && $v !== 1);
-    return './' . ($params ? '?' . http_build_query($params) : '');
+// What the owner still needs to fill in before the site is complete
+$s = get_settings();
+$todo = [];
+if ($s['hours'] === '') $todo[] = ['Add your opening hours', 'settings#g-contact'];
+$missingSocial = array_filter(['Instagram' => 'instagram_url', 'Facebook' => 'facebook_url', 'TikTok' => 'tiktok_url'], fn($k) => $s[$k] === '');
+if ($missingSocial) $todo[] = ['Add your ' . implode(', ', array_keys($missingSocial)) . ' link' . (count($missingSocial) > 1 ? 's' : ''), 'settings#g-social'];
+if ($s['academy_duration'] === '' || $s['academy_fees'] === '' || $s['academy_intake'] === '') $todo[] = ['Add Academy duration, fees and next intake', 'settings#g-academy'];
+if ($s['payment_methods'] === '') $todo[] = ['Choose how customers can pay', 'settings#g-payment'];
+if (!bank_accounts($s)) $todo[] = ['Add your bank account details', 'settings#g-payment'];
+if (($p = alert_problem($s)) !== '' && $s['alerts'] === 'on') $todo[] = ['Email alerts: ' . rtrim(lcfirst($p), '.'), 'settings#g-alerts'];
+if ($num('SELECT COUNT(*) FROM testimonials WHERE is_visible = 1') === 0) $todo[] = ['Publish your first client testimonial', 'testimonials'];
+if (($samples = $num('SELECT COUNT(*) FROM gallery_items WHERE is_visible = 1 AND is_sample = 1')) > 0) {
+    $todo[] = ["Replace $samples sample photo" . ($samples > 1 ? 's' : '') . ' in the gallery with your own', 'gallery'];
 }
 
-admin_header('Enquiries', $admin, 'inbox');
+admin_header('Dashboard', $admin, 'dashboard');
 ?>
     <div class="page__head">
       <div>
-        <h1 class="page__title">Enquiries</h1>
-        <p class="page__sub">Welcome back, <?= e($admin['name']) ?>.
-          <?= $counts['new'] ? '<strong>' . $counts['new'] . ' new</strong> ' . ($counts['new'] === 1 ? 'enquiry needs' : 'enquiries need') . ' a reply.' : 'You are all caught up.' ?></p>
+        <h1 class="page__title">Welcome back, <?= e(explode(' ', $admin['name'])[0]) ?></h1>
+        <p class="page__sub"><?= e(date('l, j F Y')) ?></p>
       </div>
-      <form class="search" method="get" role="search">
-<?php if ($status !== 'all'): ?>
-        <input type="hidden" name="status" value="<?= e($status) ?>">
-<?php endif; ?>
-        <label class="visually-hidden" for="q">Search enquiries</label>
-        <input id="q" type="search" name="q" value="<?= e($q) ?>" placeholder="Search name, email, phone or ref">
-        <button type="submit" class="btn btn--primary">Search</button>
-      </form>
     </div>
 
-    <nav class="tabs" aria-label="Filter by status">
-<?php foreach (['all' => 'All'] + STATUSES as $key => $label): ?>
-      <a href="<?= e(inbox_url(['status' => $key, 'page' => 1])) ?>" class="tabs__tab" <?= $status === $key ? 'aria-current="page"' : '' ?>>
-        <?= e($label) ?> <span class="tabs__count"><?= $counts[$key] ?></span>
-      </a>
-<?php endforeach; ?>
-    </nav>
-
-<?php if (!$rows): ?>
-    <div class="empty">
-      <p class="empty__title"><?= $q !== '' ? 'No enquiries match “' . e($q) . '”.' : 'No enquiries here yet.' ?></p>
-      <p>New enquiries from the website's contact form will appear here automatically.</p>
-    </div>
-<?php else: ?>
-    <ul class="inbox">
-<?php foreach ($rows as $r): ?>
-      <li class="inbox__item<?= $r['status'] === 'new' ? ' is-new' : '' ?>">
-        <a href="enquiry?id=<?= (int) $r['id'] ?>" class="inbox__link">
-          <span class="inbox__main">
-            <span class="inbox__name"><?= e($r['name']) ?></span>
-            <span class="inbox__meta"><?= e(SERVICES[$r['service']] ?? $r['service']) ?>
-              <?php if ($r['event_date']): ?> · Event <?= e(format_date($r['event_date'], 'j M Y')) ?><?php endif; ?>
-              <?php if ($r['files']): ?> · <?= (int) $r['files'] ?> image<?= $r['files'] > 1 ? 's' : '' ?><?php endif; ?></span>
-          </span>
-          <span class="inbox__side">
-            <span class="badge badge--<?= e($r['status']) ?>"><?= e(STATUSES[$r['status']]) ?></span>
-            <span class="inbox__date"><?= e(format_date($r['created_at'], 'j M, g:ia')) ?></span>
-            <span class="inbox__ref"><?= e($r['ref']) ?></span>
-          </span>
-        </a>
-      </li>
+    <ul class="stats">
+<?php foreach ($stats as [$label, $value, $href, $note]): ?>
+      <li><a class="stat<?= $value && str_starts_with($label, 'New') ? ' is-alert' : '' ?>" href="<?= e($href) ?>">
+        <span class="stat__value"><?= $value ?></span>
+        <span class="stat__label"><?= e($label) ?></span>
+        <span class="stat__note"><?= e($note) ?></span>
+      </a></li>
 <?php endforeach; ?>
     </ul>
 
-<?php if ($pages > 1): ?>
-    <nav class="pager" aria-label="Pages">
-      <?php if ($page > 1): ?><a class="btn" href="<?= e(inbox_url(['page' => $page - 1])) ?>">← Newer</a><?php endif; ?>
-      <span>Page <?= $page ?> of <?= $pages ?></span>
-      <?php if ($page < $pages): ?><a class="btn" href="<?= e(inbox_url(['page' => $page + 1])) ?>">Older →</a><?php endif; ?>
-    </nav>
+    <div class="dash">
+      <section class="card" aria-labelledby="up-h">
+        <h2 id="up-h" class="card__title">Occasions in the next 30 days</h2>
+<?php if (!$upcoming): ?>
+        <p class="hint">No open enquiries have an occasion date in the next 30 days.</p>
+<?php else: ?>
+        <ul class="minilist">
+<?php foreach ($upcoming as $u):
+          $days = (int) (new DateTime('today'))->diff(new DateTime($u['event_date']))->days; ?>
+          <li><a href="enquiry?id=<?= (int) $u['id'] ?>">
+            <span class="minilist__main"><strong><?= e($u['name']) ?></strong> · <?= e(SERVICES[$u['service']] ?? $u['service']) ?></span>
+            <span class="minilist__side"><?= e(format_date($u['event_date'], 'D j M')) ?> · <?= $days === 0 ? 'today' : ($days === 1 ? 'tomorrow' : "in $days days") ?></span>
+          </a></li>
+<?php endforeach; ?>
+        </ul>
 <?php endif; ?>
+      </section>
+
+<?php if ($todo): ?>
+      <section class="card" aria-labelledby="todo-h">
+        <h2 id="todo-h" class="card__title">Finish setting up the website</h2>
+        <ul class="todo">
+<?php foreach ($todo as [$text, $href]): ?>
+          <li><a href="<?= e($href) ?>"><?= e($text) ?> →</a></li>
+<?php endforeach; ?>
+        </ul>
+      </section>
 <?php endif; ?>
+
+      <section class="card" aria-labelledby="le-h">
+        <h2 id="le-h" class="card__title">Latest enquiries</h2>
+<?php if (!$latestEnq): ?>
+        <p class="hint">None yet. Enquiries from the website's contact form appear here.</p>
+<?php else: ?>
+        <ul class="minilist">
+<?php foreach ($latestEnq as $r): ?>
+          <li><a href="enquiry?id=<?= (int) $r['id'] ?>">
+            <span class="minilist__main"><strong><?= e($r['name']) ?></strong> · <?= e(SERVICES[$r['service']] ?? $r['service']) ?></span>
+            <span class="minilist__side"><span class="badge badge--<?= e($r['status']) ?>"><?= e(STATUSES[$r['status']]) ?></span> <?= e(format_date($r['created_at'], 'j M')) ?></span>
+          </a></li>
+<?php endforeach; ?>
+        </ul>
+        <p class="dash__more"><a href="enquiries">All enquiries →</a></p>
+<?php endif; ?>
+      </section>
+
+      <section class="card" aria-labelledby="lr-h">
+        <h2 id="lr-h" class="card__title">Latest Academy registrations</h2>
+<?php if (!$latestReg): ?>
+        <p class="hint">None yet. Registrations from the Academy form appear here.</p>
+<?php else: ?>
+        <ul class="minilist">
+<?php foreach ($latestReg as $r): ?>
+          <li><a href="academy#r-<?= (int) $r['id'] ?>">
+            <span class="minilist__main"><strong><?= e($r['name']) ?></strong> · <?= e(ACADEMY_LEVELS[$r['level']]) ?></span>
+            <span class="minilist__side"><span class="badge badge--<?= $r['status'] === 'enrolled' ? 'closed' : e($r['status']) ?>"><?= e(ACADEMY_STATUSES[$r['status']]) ?></span> <?= e(format_date($r['created_at'], 'j M')) ?></span>
+          </a></li>
+<?php endforeach; ?>
+        </ul>
+        <p class="dash__more"><a href="academy">All registrations →</a></p>
+<?php endif; ?>
+      </section>
+    </div>
 <?php
 admin_footer();

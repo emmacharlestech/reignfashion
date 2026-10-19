@@ -35,6 +35,8 @@
     },
     // Academy schedule & fees (empty = "To be confirmed")
     academy: { duration: '', fees: '', intake: '' },
+    // Ways to pay and bank accounts (set in Admin → Settings → Payment)
+    payment: { methods: [], terms: '', accounts: [] },
 
     // Live settings edited in the admin area (admin/settings.php). The values
     // above are the fallback if this can't be reached (e.g. file:// preview).
@@ -713,6 +715,25 @@
         return frag;
       },
       hours: () => (hours ? el('span', {}, hours) : pending()),
+      // Hidden until the owner saves payment options in the admin
+      payment: (node) => {
+        const { methods = [], terms = '', accounts = [] } = SITE_CONFIG.payment ?? {};
+        const row = node.closest('li');
+        if (row) row.hidden = !methods.length && !accounts.length;
+        const frag = document.createDocumentFragment();
+        if (methods.length) frag.append(el('span', {}, methods.join(' · ')));
+        accounts.forEach(({ bank, name, number }) => {
+          const acct = el('span', { className: 'contact-bank' });
+          acct.append(el('strong', {}, bank), el('span', {}, name), el('span', { className: 'contact-bank__number' }, number));
+          frag.append(acct);
+        });
+        if (terms) frag.append(el('span', { className: 'contact-pay-note' }, terms));
+        if (accounts.length) {
+          frag.append(el('span', { className: 'contact-pay-note' },
+            `Only pay into ${accounts.length > 1 ? 'these accounts' : 'this account'}. If anyone asks you to pay elsewhere, call us first.`));
+        }
+        return frag;
+      },
       social: () => {
         const frag = document.createDocumentFragment();
         const ICONS = {
@@ -751,7 +772,7 @@
 
     document.querySelectorAll('[data-contact]').forEach((node) => {
       const fill = fillers[node.dataset.contact];
-      if (fill) node.replaceChildren(fill());
+      if (fill) node.replaceChildren(fill(node));
     });
   }
 
@@ -835,7 +856,7 @@
       if (!res.ok) return;
       const { settings } = await res.json();
       if (!settings) return;
-      ['whatsappNumber', 'phones', 'email', 'address', 'hours', 'social', 'academy'].forEach((key) => {
+      ['whatsappNumber', 'phones', 'email', 'address', 'hours', 'social', 'academy', 'payment'].forEach((key) => {
         if (settings[key] !== undefined) SITE_CONFIG[key] = settings[key];
       });
       initContactDetails();

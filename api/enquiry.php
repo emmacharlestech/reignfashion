@@ -11,6 +11,7 @@
 declare(strict_types=1);
 
 require __DIR__ . '/../backend/bootstrap.php';
+require __DIR__ . '/../backend/notify.php';
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
     header('Allow: POST');
@@ -134,8 +135,8 @@ try {
     json_response(500, ['ok' => false, 'error' => 'Sorry, your enquiry could not be saved. Please try again or use WhatsApp.']);
 }
 
-/* ------------------------------------------- Email notification (optional) */
-if (filter_var($CONFIG['mail_to'], FILTER_VALIDATE_EMAIL) && filter_var($CONFIG['mail_from'], FILTER_VALIDATE_EMAIL)) {
+/* ------------------------------------- Email alert (Admin → Settings → Email alerts) */
+try {
     $body = implode("\n", [
         "New enquiry $ref from the Reign Fashion Empire website",
         str_repeat('-', 48),
@@ -149,20 +150,14 @@ if (filter_var($CONFIG['mail_to'], FILTER_VALIDATE_EMAIL) && filter_var($CONFIG[
         '',
         'Message:',
         $message,
+        '',
+        'Open in the admin: ' . admin_link("enquiry?id=$id"),
     ]);
-    $subject = '=?UTF-8?B?' . base64_encode("New enquiry $ref: " . SERVICES[$service] . " — $name") . '?=';
-    $headers = implode("\r\n", [
-        'From: Reign Fashion Empire Website <' . $CONFIG['mail_from'] . '>',
-        'Reply-To: ' . $email,
-        'MIME-Version: 1.0',
-        'Content-Type: text/plain; charset=UTF-8',
-        'Content-Transfer-Encoding: base64',
-    ]);
-    if (@mail($CONFIG['mail_to'], $subject, chunk_split(base64_encode($body)), $headers)) {
+    if (send_admin_alert("New enquiry $ref: " . SERVICES[$service] . " — $name", $body, $email)) {
         db()->prepare('UPDATE enquiries SET email_sent = 1 WHERE id = ?')->execute([$id]);
-    } else {
-        error_log("Enquiry $ref saved but notification email failed.");
     }
+} catch (Throwable $e) {
+    error_log("Enquiry $ref saved but the email alert failed: " . $e->getMessage());
 }
 
 json_response(201, ['ok' => true, 'ref' => $ref]);

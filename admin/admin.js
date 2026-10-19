@@ -19,3 +19,21 @@
     if (nav.classList.contains('is-open') && !nav.contains(e.target) && !toggle.contains(e.target)) setOpen(false);
   });
 })();
+
+/* Copy buttons (e.g. payment details): [data-copy] holds the text */
+(() => {
+  'use strict';
+  document.querySelectorAll('[data-copy]').forEach((btn) => {
+    const label = btn.textContent;
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copy);
+        btn.textContent = 'Copied ✓';
+      } catch {
+        // Clipboard blocked (e.g. not HTTPS): show the text so it can be copied by hand
+        window.prompt('Copy the payment details:', btn.dataset.copy);
+      }
+      setTimeout(() => { btn.textContent = label; }, 2000);
+    });
+  });
+})();

@@ -69,6 +69,8 @@ admin_header('Academy', $admin, 'academy');
       </form>
     </div>
 
+    <p class="export-link"><a class="btn btn--sm" href="export?type=academy<?= $status !== 'all' ? '&amp;status=' . e($status) : '' ?>">Download <?= $status !== 'all' ? e(strtolower(ACADEMY_STATUSES[$status])) . ' ' : '' ?>registrations (CSV)</a></p>
+
     <nav class="tabs" aria-label="Filter by status">
 <?php foreach (['all' => 'All'] + ACADEMY_STATUSES as $key => $label): ?>
       <a href="academy<?= $key === 'all' ? '' : '?status=' . e($key) ?>" class="tabs__tab" <?= $status === $key ? 'aria-current="page"' : '' ?>>
@@ -111,6 +113,13 @@ admin_header('Academy', $admin, 'academy');
           <a class="btn btn--sm" href="tel:<?= e(preg_replace('/[^\d+]/', '', $r['phone'])) ?>">Call</a>
           <a class="btn btn--sm" href="mailto:<?= e($r['email']) ?>?subject=<?= e(rawurlencode("Reign Fashion Academy registration {$r['ref']}")) ?>">Email</a>
         </div>
+
+        <details class="gcard__edit">
+          <summary>Send payment details</summary>
+          <div class="regitem__actions">
+            <?php payment_buttons($r['ref'], $wa, $r['email'], $first, true); ?>
+          </div>
+        </details>
 
         <form method="post" class="segmented segmented--4">
           <?= csrf_field() ?>

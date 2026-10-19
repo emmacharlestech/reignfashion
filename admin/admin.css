@@ -372,3 +372,37 @@ h1, h2, h3 { color: var(--ink); margin: 0; }
 .upload__summary,
 .gcard__edit summary { min-height: 44px; }
 .check { min-height: 44px; }
+
+/* Dashboard */
+.stats { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.stat { display: grid; gap: 2px; height: 100%; padding: 16px; background: var(--white); border: 1px solid var(--line); border-radius: 14px; text-decoration: none; color: inherit; transition: border-color .2s; }
+.stat:hover { border-color: var(--gold-deep); }
+.stat.is-alert { border-left: 4px solid var(--gold); }
+.stat__value { font-family: var(--f-serif); font-size: 2.4rem; line-height: 1; color: var(--ink); }
+.stat__label { font-weight: 600; color: var(--ink); font-size: 14px; }
+.stat__note { font-size: 12.5px; color: var(--muted); }
+.dash { display: grid; gap: 16px; }
+.dash__more { margin: 10px 0 0; font-size: 14px; font-weight: 600; }
+.dash__more a { text-decoration: none; display: inline-flex; min-height: 44px; align-items: center; }
+.minilist, .todo { list-style: none; margin: 0; padding: 0; }
+.minilist li + li, .todo li + li { border-top: 1px solid var(--line); }
+.minilist a { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 4px 12px; min-height: 48px; padding: 8px 0; text-decoration: none; color: var(--ink-soft); }
+.minilist a:hover strong { color: var(--gold-deep); }
+.minilist strong { color: var(--ink); }
+.minilist__side { font-size: 13px; color: var(--muted); display: inline-flex; gap: 8px; align-items: center; }
+.todo a { display: flex; align-items: center; min-height: 44px; font-weight: 600; text-decoration: none; }
+.todo a:hover { color: var(--gold-deep); }
+@media (min-width: 760px) {
+  .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .dash { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+}
+
+/* CSV download link above lists */
+.export-link { margin: -8px 0 14px; }
+
+/* Settings: tick boxes, dropdowns, test email */
+.choices { margin: 0; padding: 0; border: 0; display: grid; gap: 2px; }
+.choices legend { padding: 0; margin-bottom: 4px; font-weight: 600; font-size: 14px; color: var(--ink); }
+.check--box { font-weight: 500; color: var(--ink); }
+.check--box input { accent-color: var(--green); }
+.settings__test { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 16px 0 0; }

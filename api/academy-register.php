@@ -8,6 +8,7 @@
 declare(strict_types=1);
 
 require __DIR__ . '/../backend/academy.php';
+require __DIR__ . '/../backend/notify.php';
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
     header('Allow: POST');
@@ -64,8 +65,8 @@ try {
     json_response(500, ['ok' => false, 'error' => 'Sorry, your registration could not be saved. Please try again or contact us on WhatsApp.']);
 }
 
-// Email notification (only when a sender address on the site's domain is configured)
-if (filter_var($CONFIG['mail_to'], FILTER_VALIDATE_EMAIL) && filter_var($CONFIG['mail_from'], FILTER_VALIDATE_EMAIL)) {
+// Email alert (Admin → Settings → Email alerts)
+try {
     $body = implode("\n", [
         "New Academy registration $ref",
         str_repeat('-', 40),
@@ -77,18 +78,14 @@ if (filter_var($CONFIG['mail_to'], FILTER_VALIDATE_EMAIL) && filter_var($CONFIG[
         '',
         'Experience / goals:',
         $experience !== '' ? $experience : '—',
+        '',
+        'Open in the admin: ' . admin_link("academy#r-$id"),
     ]);
-    $headers = implode("\r\n", [
-        'From: Reign Fashion Empire Website <' . $CONFIG['mail_from'] . '>',
-        'Reply-To: ' . $email,
-        'MIME-Version: 1.0',
-        'Content-Type: text/plain; charset=UTF-8',
-        'Content-Transfer-Encoding: base64',
-    ]);
-    $subject = '=?UTF-8?B?' . base64_encode("New Academy registration $ref — $name") . '?=';
-    if (@mail($CONFIG['mail_to'], $subject, chunk_split(base64_encode($body)), $headers)) {
+    if (send_admin_alert("New Academy registration $ref — $name", $body, $email)) {
         db()->prepare('UPDATE academy_registrations SET email_sent = 1 WHERE id = ?')->execute([$id]);
     }
+} catch (Throwable $e) {
+    error_log("Academy registration $ref saved but the email alert failed: " . $e->getMessage());
 }
 
 json_response(201, ['ok' => true, 'ref' => $ref]);
