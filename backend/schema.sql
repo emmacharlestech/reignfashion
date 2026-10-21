@@ -112,3 +112,22 @@ CREATE TABLE IF NOT EXISTS academy_registrations (
   INDEX idx_status_created (status, created_at),
   INDEX idx_ip_created (ip_hash, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Video testimonials ("Client Stories"), managed in admin/videos.php.
+-- Also created automatically on first use (backend/videos.php), so the live site needs no manual step.
+CREATE TABLE IF NOT EXISTS video_testimonials (
+  id                 INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  client_name        VARCHAR(80)  NOT NULL,
+  service            VARCHAR(40)  NOT NULL,
+  caption            VARCHAR(200) NOT NULL DEFAULT '',
+  video_path         VARCHAR(255) NOT NULL,                   -- relative to the site root, assets/uploads/videos/…
+  poster_path        VARCHAR(255) NULL,                       -- cover image grabbed from the video in the admin
+  mime               VARCHAR(40)  NOT NULL,
+  size_bytes         INT UNSIGNED NOT NULL,
+  duration_seconds   SMALLINT UNSIGNED NULL,
+  consent_confirmed  TINYINT(1)   NOT NULL,                   -- owner confirmed the client gave permission
+  is_visible         TINYINT(1)   NOT NULL DEFAULT 1,
+  sort_order         INT          NOT NULL DEFAULT 0,
+  created_at         DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_visible_order (is_visible, sort_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

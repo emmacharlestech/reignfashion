@@ -59,6 +59,7 @@ function admin_header(string $title, ?array $admin = null, string $active = ''):
       <a href="academy" <?= $active === 'academy' ? 'aria-current="page"' : '' ?>>Academy</a>
       <a href="gallery" <?= $active === 'gallery' ? 'aria-current="page"' : '' ?>>Gallery</a>
       <a href="testimonials" <?= $active === 'testimonials' ? 'aria-current="page"' : '' ?>>Testimonials</a>
+      <a href="videos" <?= $active === 'videos' ? 'aria-current="page"' : '' ?>>Videos</a>
       <a href="settings" <?= $active === 'settings' ? 'aria-current="page"' : '' ?>>Settings</a>
       <a href="password" <?= $active === 'account' ? 'aria-current="page"' : '' ?>>Account</a>
       <a href="../" target="_blank" rel="noopener">View site ↗</a>

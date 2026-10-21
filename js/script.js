@@ -632,6 +632,86 @@
   }
 
   /* ------------------------------------------------------------------------
+     Client Stories: video testimonials published from the admin area
+     (admin/videos.php). The section stays hidden until there is at least one.
+     Videos load only when played, and only one plays at a time.
+     ------------------------------------------------------------------------ */
+  async function loadClientStories() {
+    const section = document.getElementById('client-stories');
+    const grid = section && section.querySelector('.stories__grid');
+    if (!grid || location.protocol === 'file:') return;
+    try {
+      const res = await fetch('api/videos.php', { headers: { Accept: 'application/json' } });
+      if (!res.ok) return;
+      const { items } = await res.json();
+      if (!Array.isArray(items) || !items.length) return;
+
+      const mk = (tag, cls, text) => {
+        const n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (text) n.textContent = text;
+        return n;
+      };
+      const svgNS = 'http://www.w3.org/2000/svg';
+      const playIcon = () => {
+        const svg = document.createElementNS(svgNS, 'svg');
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('aria-hidden', 'true');
+        svg.setAttribute('focusable', 'false');
+        const path = document.createElementNS(svgNS, 'path');
+        path.setAttribute('d', 'M7 4.5v15l13-7.5z');
+        svg.append(path);
+        return svg;
+      };
+
+      grid.replaceChildren(...items.map((v) => {
+        const li = mk('li', 'story');
+        const media = mk('div', 'story__media');
+        const video = document.createElement('video');
+        video.preload = 'none';
+        video.playsInline = true;
+        video.setAttribute('playsinline', '');
+        if (v.poster) video.poster = v.poster;
+        const source = document.createElement('source');
+        source.src = v.src;
+        if (v.type) source.type = v.type;
+        video.append(source);
+        video.setAttribute('aria-label', `Video from ${v.name}`);
+
+        const play = mk('button', 'story__play');
+        play.type = 'button';
+        play.setAttribute('aria-label', `Play video from ${v.name}${v.duration ? ` (${v.duration})` : ''}`);
+        const icon = mk('span', 'story__play-icon');
+        icon.append(playIcon());
+        play.append(icon);
+        play.addEventListener('click', () => {
+          li.classList.add('is-playing');
+          video.controls = true;
+          video.play().catch(() => {});
+          video.focus();
+        });
+        // Only one video plays at a time
+        video.addEventListener('play', () => {
+          grid.querySelectorAll('video').forEach((other) => { if (other !== video) other.pause(); });
+        });
+
+        media.append(video, play);
+        if (v.duration) media.append(mk('span', 'story__duration', v.duration));
+        li.append(media);
+        if (v.caption) li.append(mk('p', 'story__quote', `“${v.caption}”`));
+        const who = mk('p', 'story__who');
+        who.append(mk('span', 'story__name', v.name));
+        if (v.serviceLabel) who.append(mk('span', 'story__meta', v.serviceLabel));
+        li.append(who);
+        return li;
+      }));
+      section.hidden = false;
+    } catch (err) {
+      console.info('Client stories unavailable.', err);
+    }
+  }
+
+  /* ------------------------------------------------------------------------
      Live testimonials: genuine client quotes published from the admin area
      (admin/testimonials.php) replace the placeholder slides. Built with DOM
      methods only. If none are published yet, the placeholders stay.
@@ -1288,6 +1368,7 @@
     loadLiveGallery().then((replaced) => { if (replaced) refreshGallery(); });
     initCarousel();
     loadLiveTestimonials().then((replaced) => { if (replaced) refreshCarousels(); });
+    loadClientStories();
     initContactDetails();
     document.querySelectorAll('[data-year]').forEach((n) => { n.textContent = new Date().getFullYear(); });
     initWhatsApp();

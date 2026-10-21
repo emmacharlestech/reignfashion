@@ -26,7 +26,7 @@ function admin_headers(): void
     header('Referrer-Policy: no-referrer');
     header('X-Robots-Tag: noindex, nofollow');
     header('Cache-Control: no-store');
-    header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self' https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; font-src https://fonts.gstatic.com; form-action 'self'; frame-ancestors 'none'; base-uri 'self'");
+    header("Content-Security-Policy: default-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; style-src 'self' https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; font-src https://fonts.gstatic.com; form-action 'self'; frame-ancestors 'none'; base-uri 'self'");
 }
 
 function start_admin_session(): void

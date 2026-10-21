@@ -1,9 +1,12 @@
-# Uploaded files: only images are ever served, nothing can execute.
+# Uploaded files: only images and video testimonials are ever served, nothing can execute.
 Options -Indexes
 Require all denied
-<FilesMatch "(?i)\.(jpe?g|png|webp)$">
+<FilesMatch "(?i)\.(jpe?g|png|webp|mp4|m4v|mov|webm)$">
   Require all granted
 </FilesMatch>
+AddType video/mp4 .mp4 .m4v
+AddType video/quicktime .mov
+AddType video/webm .webm
 <IfModule mod_php.c>
   php_flag engine off
 </IfModule>

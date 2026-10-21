@@ -25,3 +25,18 @@ DirectoryIndex index.php
   RewriteCond %{REQUEST_FILENAME}.php -f
   RewriteRule ^([a-z-]+)$ $1.php [L]
 </IfModule>
+
+# Video testimonials: allow uploads up to ~64 MB in the admin area.
+# (Apache with mod_php, e.g. XAMPP. PHP-FPM / LiteSpeed hosts read admin/.user.ini instead.)
+<IfModule mod_php.c>
+  php_value upload_max_filesize 64M
+  php_value post_max_size 70M
+  php_value max_execution_time 300
+  php_value max_input_time 300
+</IfModule>
+<IfModule mod_php7.c>
+  php_value upload_max_filesize 64M
+  php_value post_max_size 70M
+  php_value max_execution_time 300
+  php_value max_input_time 300
+</IfModule>

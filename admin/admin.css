@@ -406,3 +406,17 @@ h1, h2, h3 { color: var(--ink); margin: 0; }
 .check--box { font-weight: 500; color: var(--ink); }
 .check--box input { accent-color: var(--green); }
 .settings__test { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 16px 0 0; }
+
+/* Video testimonials */
+.glist--videos { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.gcard__thumb--video { aspect-ratio: 4 / 5; background: #000; }
+.gcard__thumb--video video { width: 100%; height: 100%; object-fit: contain; background: #000; display: block; }
+.gcard__thumb--video .gcard__pos { z-index: 1; pointer-events: none; }
+.gcard__caption { margin: 0; font-family: var(--f-serif); font-size: 1.05rem; line-height: 1.35; color: var(--ink); }
+.video-preview { margin-top: 10px; display: grid; gap: 6px; }
+.video-preview__player { width: 100%; max-width: 320px; max-height: 360px; border-radius: 10px; background: #000; }
+.video-preview__info { margin: 0; overflow-wrap: anywhere; }
+.upload-progress { display: grid; gap: 6px; }
+.upload-progress__bar { height: 10px; border-radius: 999px; background: var(--ivory-deep); overflow: hidden; }
+.upload-progress__bar span { display: block; height: 100%; width: 0; background: var(--gold); transition: width .2s; }
+.upload-progress__text { margin: 0; }
