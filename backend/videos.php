@@ -11,7 +11,6 @@ require_once __DIR__ . '/gallery.php';          // SITE_ROOT, GALLERY_CATEGORIES
 
 const VIDEO_UPLOAD_REL  = 'assets/uploads/videos';
 const VIDEO_MAX_BYTES   = 60 * 1024 * 1024;       // our own ceiling; the server's PHP limits may be lower
-const VIDEO_MAX_TITLE   = 120;
 const VIDEO_MAX_CAPTION = 200;
 const VIDEO_TYPES = [
     'video/mp4'       => 'mp4',
@@ -27,7 +26,6 @@ function ensure_video_table(): void
     if ($done) return;
     db()->exec("CREATE TABLE IF NOT EXISTS design_videos (
         id                 INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        title              VARCHAR(120) NOT NULL,
         category           VARCHAR(20)  NOT NULL,
         caption            VARCHAR(200) NOT NULL DEFAULT '',
         video_path         VARCHAR(255) NOT NULL,
@@ -76,16 +74,14 @@ function format_mb(int $bytes): string
     return rtrim(rtrim(number_format($bytes / 1048576, 1), '0'), '.') . ' MB';
 }
 
-/** Validate the title/category/caption/permission fields. */
+/** Validate the category/caption/permission fields. */
 function video_fields(array $in): array
 {
     $f = [
-        'title'    => clean_line($in['title'] ?? '', VIDEO_MAX_TITLE),
         'category' => (string) ($in['category'] ?? ''),
         'caption'  => mb_substr(clean_line($in['caption'] ?? '', VIDEO_MAX_CAPTION + 20), 0, VIDEO_MAX_CAPTION),
         'consent'  => !empty($in['consent']) ? 1 : 0,
     ];
-    if ($f['title'] === '') throw new RuntimeException('Please give the video a title, e.g. “Emerald Lace Aso-Ebi”.');
     if (!isset(GALLERY_CATEGORIES[$f['category']])) throw new RuntimeException('Please choose a category.');
     if (!$f['consent']) throw new RuntimeException('Please confirm the client agreed to this video being shown on the website.');
     return $f;

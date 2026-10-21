@@ -331,7 +331,7 @@ How it works:
 
 **Videos (`admin/videos.php`).** The owner uploads short videos of clients wearing Reign Fashion designs. They appear in the "In Motion" section on the Home and Collections pages.
 
-- **Upload:** an MP4, MOV or WebM file (a video saved from WhatsApp or a phone works), a title (e.g. "Emerald Lace Aso-Ebi"), a gallery category, an optional caption, and a tick confirming the client agreed to be shown. Videos go up to 60 MB, or less if the server's PHP limits are lower; the page shows the real limit.
+- **Upload:** an MP4, MOV or WebM file (a video saved from WhatsApp or a phone works), a gallery category, an optional caption, and a tick confirming the client agreed to be shown. Videos go up to 60 MB, or less if the server's PHP limits are lower; the page shows the real limit.
 - **In the browser:** the admin page previews the video, reads its length, grabs a cover image from it, checks the size before sending, and uploads in the background with a progress bar.
 - **On the server:** files are checked by their real content and saved under random names in `assets/uploads/videos/`. That folder only serves image and video files.
 - **Upload limits:** `admin/.htaccess` (Apache mod_php, XAMPP) and `admin/.user.ini` (PHP-FPM/LiteSpeed, typical cPanel) raise PHP's limits for the admin folder only. A video over the limit gets a clear message rather than a "session expired" error.

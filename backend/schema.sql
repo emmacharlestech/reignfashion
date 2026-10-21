@@ -117,7 +117,6 @@ CREATE TABLE IF NOT EXISTS academy_registrations (
 -- Also created automatically on first use (backend/videos.php), so the live site needs no manual step.
 CREATE TABLE IF NOT EXISTS design_videos (
   id                 INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  title              VARCHAR(120) NOT NULL,                   -- e.g. Emerald Lace Aso-Ebi
   category           VARCHAR(20)  NOT NULL,                   -- gallery category: bridal, aso-ebi, ready-to-wear, kids, men
   caption            VARCHAR(200) NOT NULL DEFAULT '',
   video_path         VARCHAR(255) NOT NULL,                   -- relative to the site root, assets/uploads/videos/…

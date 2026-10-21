@@ -677,11 +677,12 @@
         source.src = v.src;
         if (v.type) source.type = v.type;
         video.append(source);
-        video.setAttribute('aria-label', v.title);
+        const label = `${v.categoryLabel || 'Reign Fashion'} video`;
+        video.setAttribute('aria-label', v.caption ? `${label}: ${v.caption}` : label);
 
         const play = mk('button', 'motion-card__play');
         play.type = 'button';
-        play.setAttribute('aria-label', `Play video: ${v.title}${v.duration ? ` (${v.duration})` : ''}`);
+        play.setAttribute('aria-label', `Play ${label}${v.caption ? `: ${v.caption}` : ''}${v.duration ? ` (${v.duration})` : ''}`);
         const icon = mk('span', 'motion-card__play-icon');
         icon.append(playIcon());
         play.append(icon);
@@ -700,7 +701,6 @@
         if (v.duration) media.append(mk('span', 'motion-card__duration', v.duration));
         li.append(media);
         if (v.categoryLabel) li.append(mk('p', 'motion-card__meta', v.categoryLabel));
-        li.append(mk('h3', 'motion-card__title', v.title));
         if (v.caption) li.append(mk('p', 'motion-card__caption', v.caption));
         return li;
       }));

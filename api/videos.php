@@ -14,7 +14,6 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
 
 try {
     $items = array_map(fn($v) => [
-        'title'         => $v['title'],
         'category'      => $v['category'],
         'categoryLabel' => GALLERY_CATEGORIES[$v['category']] ?? '',
         'caption'       => $v['caption'],

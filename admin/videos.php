@@ -39,16 +39,16 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             $stored = store_video_upload($_FILES['video'] ?? [], $_FILES['poster'] ?? null);
             $duration = (int) ($_POST['duration'] ?? 0);
             $first = (int) db()->query('SELECT COALESCE(MIN(sort_order), 10) FROM design_videos')->fetchColumn();
-            db()->prepare('INSERT INTO design_videos (title, category, caption, video_path, poster_path, mime, size_bytes, duration_seconds, consent_confirmed, sort_order)
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-                ->execute([$f['title'], $f['category'], $f['caption'], $stored['video'], $stored['poster'], $stored['mime'], $stored['size'],
+            db()->prepare('INSERT INTO design_videos (category, caption, video_path, poster_path, mime, size_bytes, duration_seconds, consent_confirmed, sort_order)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+                ->execute([$f['category'], $f['caption'], $stored['video'], $stored['poster'], $stored['mime'], $stored['size'],
                            $duration > 0 && $duration < 3600 ? $duration : null, $f['consent'], $first - 10]);
-            flash("“{$f['title']}” published. It now shows first in “In Motion” on the Home and Collections pages.");
+            flash(GALLERY_CATEGORIES[$f['category']] . ' video published. It now shows first in “In Motion” on the Home and Collections pages.');
         } elseif ($action === 'update') {
             $f = video_fields($_POST);
-            db()->prepare('UPDATE design_videos SET title = ?, category = ?, caption = ?, consent_confirmed = ? WHERE id = ?')
-                ->execute([$f['title'], $f['category'], $f['caption'], $f['consent'], $id]);
-            flash("“{$f['title']}” updated.");
+            db()->prepare('UPDATE design_videos SET category = ?, caption = ?, consent_confirmed = ? WHERE id = ?')
+                ->execute([$f['category'], $f['caption'], $f['consent'], $id]);
+            flash('Video updated.');
         } elseif ($action === 'toggle') {
             db()->prepare('UPDATE design_videos SET is_visible = 1 - is_visible WHERE id = ?')->execute([$id]);
             flash('Visibility updated.');
@@ -63,13 +63,13 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             }
             back_to_videos('#v-' . $id);
         } elseif ($action === 'delete') {
-            $s = db()->prepare('SELECT video_path, poster_path, title FROM design_videos WHERE id = ?');
+            $s = db()->prepare('SELECT video_path, poster_path FROM design_videos WHERE id = ?');
             $s->execute([$id]);
             if ($row = $s->fetch()) {
                 db()->prepare('DELETE FROM design_videos WHERE id = ?')->execute([$id]);
                 delete_video_file($row['video_path']);
                 delete_video_file($row['poster_path']);
-                flash("“{$row['title']}” removed.");
+                flash('Video removed.');
             }
         }
     } catch (RuntimeException $e) {
@@ -118,8 +118,6 @@ admin_header('Videos', $admin, 'videos');
             <p class="hint video-preview__info"></p>
           </div>
         </div>
-        <div class="field"><label for="v-title">Title</label>
-          <input id="v-title" name="title" maxlength="<?= VIDEO_MAX_TITLE ?>" required placeholder="e.g. Emerald Lace Aso-Ebi"></div>
         <div class="field"><label for="v-category">Category</label>
           <select id="v-category" name="category" required><?= video_category_options('') ?></select></div>
         <div class="field field--full"><label for="v-caption">Caption <small>(optional)</small></label>
@@ -148,11 +146,10 @@ admin_header('Videos', $admin, 'videos');
           <span class="gcard__pos"><?= $n + 1 ?></span>
         </div>
         <div class="gcard__body">
-          <p class="gcard__title"><?= e($v['title']) ?></p>
+          <p class="gcard__title"><?= e(GALLERY_CATEGORIES[$v['category']] ?? $v['category']) ?></p>
           <p class="gcard__meta">
-            <?= e(GALLERY_CATEGORIES[$v['category']] ?? $v['category']) ?>
-            <?php if ($v['duration_seconds']): ?> · <?= e(format_duration((int) $v['duration_seconds'])) ?><?php endif; ?>
-            · <?= e(format_mb((int) $v['size_bytes'])) ?>
+            <?= $v['duration_seconds'] ? e(format_duration((int) $v['duration_seconds'])) . ' · ' : '' ?>
+            <?= e(format_mb((int) $v['size_bytes'])) ?>
             <?php if (!$v['is_visible']): ?><span class="badge badge--closed">Hidden</span><?php endif; ?>
           </p>
 <?php if ($v['caption'] !== ''): ?>
@@ -160,8 +157,8 @@ admin_header('Videos', $admin, 'videos');
 <?php endif; ?>
           <div class="gcard__actions">
             <form method="post"><?= csrf_field() ?><input type="hidden" name="action" value="move"><input type="hidden" name="id" value="<?= $vid ?>">
-              <button class="btn btn--icon" name="dir" value="up" <?= $n === 0 ? 'disabled' : '' ?> aria-label="Move <?= e($v['title']) ?> earlier">↑</button>
-              <button class="btn btn--icon" name="dir" value="down" <?= $n === count($items) - 1 ? 'disabled' : '' ?> aria-label="Move <?= e($v['title']) ?> later">↓</button>
+              <button class="btn btn--icon" name="dir" value="up" <?= $n === 0 ? 'disabled' : '' ?> aria-label="Move video <?= $n + 1 ?> earlier">↑</button>
+              <button class="btn btn--icon" name="dir" value="down" <?= $n === count($items) - 1 ? 'disabled' : '' ?> aria-label="Move video <?= $n + 1 ?> later">↓</button>
             </form>
             <form method="post"><?= csrf_field() ?><input type="hidden" name="action" value="toggle"><input type="hidden" name="id" value="<?= $vid ?>">
               <button class="btn btn--sm"><?= $v['is_visible'] ? 'Hide' : 'Show' ?></button>
@@ -171,7 +168,6 @@ admin_header('Videos', $admin, 'videos');
             <summary>Edit</summary>
             <form method="post" class="form">
               <?= csrf_field() ?><input type="hidden" name="action" value="update"><input type="hidden" name="id" value="<?= $vid ?>">
-              <label class="field"><span>Title</span><input name="title" value="<?= e($v['title']) ?>" maxlength="<?= VIDEO_MAX_TITLE ?>" required></label>
               <label class="field"><span>Category</span><select name="category" required><?= video_category_options($v['category']) ?></select></label>
               <label class="field"><span>Caption</span><input name="caption" value="<?= e($v['caption']) ?>" maxlength="<?= VIDEO_MAX_CAPTION ?>"></label>
               <label class="check"><input type="checkbox" name="consent" value="1" required <?= $v['consent_confirmed'] ? 'checked' : '' ?>> <span>Client agreed to be shown</span></label>
