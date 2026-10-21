@@ -632,13 +632,14 @@
   }
 
   /* ------------------------------------------------------------------------
-     Client Stories: video testimonials published from the admin area
-     (admin/videos.php). The section stays hidden until there is at least one.
-     Videos load only when played, and only one plays at a time.
+     In Motion: videos of clients wearing Reign Fashion designs, published
+     from the admin area (admin/videos.php) to the Home and Collections pages.
+     The section stays hidden until there is at least one video. Videos load
+     only when played, and only one plays at a time.
      ------------------------------------------------------------------------ */
-  async function loadClientStories() {
-    const section = document.getElementById('client-stories');
-    const grid = section && section.querySelector('.stories__grid');
+  async function loadDesignVideos() {
+    const section = document.querySelector('[data-design-videos]');
+    const grid = section && section.querySelector('.motion__grid');
     if (!grid || location.protocol === 'file:') return;
     try {
       const res = await fetch('api/videos.php', { headers: { Accept: 'application/json' } });
@@ -665,8 +666,8 @@
       };
 
       grid.replaceChildren(...items.map((v) => {
-        const li = mk('li', 'story');
-        const media = mk('div', 'story__media');
+        const li = mk('li', 'motion-card');
+        const media = mk('div', 'motion-card__media');
         const video = document.createElement('video');
         video.preload = 'none';
         video.playsInline = true;
@@ -676,12 +677,12 @@
         source.src = v.src;
         if (v.type) source.type = v.type;
         video.append(source);
-        video.setAttribute('aria-label', `Video from ${v.name}`);
+        video.setAttribute('aria-label', v.title);
 
-        const play = mk('button', 'story__play');
+        const play = mk('button', 'motion-card__play');
         play.type = 'button';
-        play.setAttribute('aria-label', `Play video from ${v.name}${v.duration ? ` (${v.duration})` : ''}`);
-        const icon = mk('span', 'story__play-icon');
+        play.setAttribute('aria-label', `Play video: ${v.title}${v.duration ? ` (${v.duration})` : ''}`);
+        const icon = mk('span', 'motion-card__play-icon');
         icon.append(playIcon());
         play.append(icon);
         play.addEventListener('click', () => {
@@ -696,18 +697,16 @@
         });
 
         media.append(video, play);
-        if (v.duration) media.append(mk('span', 'story__duration', v.duration));
+        if (v.duration) media.append(mk('span', 'motion-card__duration', v.duration));
         li.append(media);
-        if (v.caption) li.append(mk('p', 'story__quote', `“${v.caption}”`));
-        const who = mk('p', 'story__who');
-        who.append(mk('span', 'story__name', v.name));
-        if (v.serviceLabel) who.append(mk('span', 'story__meta', v.serviceLabel));
-        li.append(who);
+        if (v.categoryLabel) li.append(mk('p', 'motion-card__meta', v.categoryLabel));
+        li.append(mk('h3', 'motion-card__title', v.title));
+        if (v.caption) li.append(mk('p', 'motion-card__caption', v.caption));
         return li;
       }));
       section.hidden = false;
     } catch (err) {
-      console.info('Client stories unavailable.', err);
+      console.info('Design videos unavailable.', err);
     }
   }
 
@@ -1368,7 +1367,7 @@
     loadLiveGallery().then((replaced) => { if (replaced) refreshGallery(); });
     initCarousel();
     loadLiveTestimonials().then((replaced) => { if (replaced) refreshCarousels(); });
-    loadClientStories();
+    loadDesignVideos();
     initContactDetails();
     document.querySelectorAll('[data-year]').forEach((n) => { n.textContent = new Date().getFullYear(); });
     initWhatsApp();

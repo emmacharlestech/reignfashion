@@ -2052,12 +2052,12 @@ body.menu-open .wordmark:focus-visible { outline-color: var(--c-gold); }
 .carousel__dot[aria-current="true"]::before { width: 30px; height: 2px; background: var(--c-gold); }
 
 /* --------------------------------------------------------------------------
-   18b. Client Stories (video testimonials from Admin → Videos)
+   18b. In Motion (videos of clients wearing our designs, from Admin → Videos)
    Phones: a swipeable row. Tablets and up: a grid of portrait cards.
    -------------------------------------------------------------------------- */
-.stories[hidden] { display: none; }
-.stories .section-head { margin-bottom: var(--space-7); }
-.stories__grid {
+.motion[hidden] { display: none; }
+.motion .section-head { margin-bottom: var(--space-7); }
+.motion__grid {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -2070,17 +2070,17 @@ body.menu-open .wordmark:focus-visible { outline-color: var(--c-gold); }
   padding-bottom: var(--space-3);
   scrollbar-width: thin;
 }
-.story { scroll-snap-align: start; display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; }
-.story__media {
+.motion-card { scroll-snap-align: start; display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; }
+.motion-card__media {
   position: relative;
   aspect-ratio: 4 / 5;
   border-radius: var(--radius-card);
   overflow: hidden;
   background: linear-gradient(160deg, var(--c-green) 0%, var(--c-green-deepest) 100%);
 }
-.story__media video { width: 100%; height: 100%; display: block; object-fit: cover; background: #000; }
-.story.is-playing .story__media video { object-fit: contain; }
-.story__play {
+.motion-card__media video { width: 100%; height: 100%; display: block; object-fit: cover; background: #000; }
+.motion-card.is-playing .motion-card__media video { object-fit: contain; }
+.motion-card__play {
   position: absolute;
   inset: 0;
   display: grid;
@@ -2089,7 +2089,7 @@ body.menu-open .wordmark:focus-visible { outline-color: var(--c-gold); }
   background: linear-gradient(180deg, rgba(2, 28, 20, 0) 45%, rgba(2, 28, 20, 0.55) 100%);
   cursor: pointer;
 }
-.story__play-icon {
+.motion-card__play-icon {
   display: grid;
   place-items: center;
   width: 4.25rem;
@@ -2100,11 +2100,11 @@ body.menu-open .wordmark:focus-visible { outline-color: var(--c-gold); }
   box-shadow: 0 10px 30px rgba(2, 28, 20, 0.35);
   transition: transform var(--dur) var(--ease), background-color var(--dur) var(--ease);
 }
-.story__play-icon svg { width: 1.6rem; height: 1.6rem; margin-left: 4px; fill: currentColor; }
-.story__play:hover .story__play-icon,
-.story__play:focus-visible .story__play-icon { transform: scale(1.08); background: var(--c-gold); }
-.story__play:focus-visible { outline: 2px solid var(--c-gold); outline-offset: -4px; }
-.story__duration {
+.motion-card__play-icon svg { width: 1.6rem; height: 1.6rem; margin-left: 4px; fill: currentColor; }
+.motion-card__play:hover .motion-card__play-icon,
+.motion-card__play:focus-visible .motion-card__play-icon { transform: scale(1.08); background: var(--c-gold); }
+.motion-card__play:focus-visible { outline: 2px solid var(--c-gold); outline-offset: -4px; }
+.motion-card__duration {
   position: absolute;
   right: var(--space-3);
   bottom: var(--space-3);
@@ -2117,32 +2117,28 @@ body.menu-open .wordmark:focus-visible { outline-color: var(--c-gold); }
   letter-spacing: 0.04em;
   pointer-events: none;
 }
-.story.is-playing .story__play,
-.story.is-playing .story__duration { display: none; }
-.story__quote {
+.motion-card.is-playing .motion-card__play,
+.motion-card.is-playing .motion-card__duration { display: none; }
+.motion-card__title {
   margin: 0;
   font-family: var(--f-serif);
-  font-size: 1.2rem;
-  line-height: 1.35;
+  font-size: 1.3rem;
+  line-height: 1.25;
   color: var(--c-green);
 }
-.story__who { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--space-2); }
-.story__name { font-weight: 600; color: var(--c-green); }
-.story__meta { font-size: 0.8125rem; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--c-gold-deep); }
+.motion-card__caption { margin: 0; font-size: 0.9375rem; line-height: 1.55; color: var(--c-ink-soft); }
+.motion-card__meta { font-size: 0.8125rem; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--c-gold-deep); }
 
 @media (min-width: 48rem) {
-  .stories__grid {
+  .motion__grid {
     grid-auto-flow: row;
     grid-auto-columns: auto;
-    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    /* Cards up to 20rem wide; a row that isn't full stays centred */
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 20rem));
+    justify-content: center;
     gap: var(--space-6) var(--space-5);
     overflow: visible;
     padding-bottom: 0;
-  }
-  /* One or two videos: keep them centred rather than stretched across the row */
-  .stories__grid:has(> .story:nth-child(-n+2):last-child) {
-    grid-template-columns: repeat(auto-fit, minmax(15rem, 20rem));
-    justify-content: center;
   }
 }
 

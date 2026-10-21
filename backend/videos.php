@@ -1,16 +1,17 @@
 <?php
 /**
- * Video testimonials ("Client Stories"): storage, uploads and queries.
- * Videos and their cover images are saved under assets/uploads/videos/, which
- * only ever serves video and image files (see assets/uploads/.htaccess).
+ * Design videos ("In Motion"): clients wearing Reign Fashion designs.
+ * Storage, uploads and queries. Videos and their cover images are saved under
+ * assets/uploads/videos/, which only ever serves video and image files
+ * (see assets/uploads/.htaccess).
  */
 declare(strict_types=1);
 
-require_once __DIR__ . '/testimonials.php';     // TESTIMONIAL_SERVICES
-require_once __DIR__ . '/gallery.php';          // SITE_ROOT
+require_once __DIR__ . '/gallery.php';          // SITE_ROOT, GALLERY_CATEGORIES
 
 const VIDEO_UPLOAD_REL  = 'assets/uploads/videos';
 const VIDEO_MAX_BYTES   = 60 * 1024 * 1024;       // our own ceiling; the server's PHP limits may be lower
+const VIDEO_MAX_TITLE   = 120;
 const VIDEO_MAX_CAPTION = 200;
 const VIDEO_TYPES = [
     'video/mp4'       => 'mp4',
@@ -24,10 +25,10 @@ function ensure_video_table(): void
 {
     static $done = false;
     if ($done) return;
-    db()->exec("CREATE TABLE IF NOT EXISTS video_testimonials (
+    db()->exec("CREATE TABLE IF NOT EXISTS design_videos (
         id                 INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        client_name        VARCHAR(80)  NOT NULL,
-        service            VARCHAR(40)  NOT NULL,
+        title              VARCHAR(120) NOT NULL,
+        category           VARCHAR(20)  NOT NULL,
         caption            VARCHAR(200) NOT NULL DEFAULT '',
         video_path         VARCHAR(255) NOT NULL,
         poster_path        VARCHAR(255) NULL,
@@ -43,10 +44,10 @@ function ensure_video_table(): void
     $done = true;
 }
 
-function video_testimonials(bool $publishedOnly = false): array
+function design_videos(bool $publishedOnly = false): array
 {
     ensure_video_table();
-    $sql = 'SELECT * FROM video_testimonials' . ($publishedOnly ? ' WHERE is_visible = 1 AND consent_confirmed = 1' : '') . ' ORDER BY sort_order, id';
+    $sql = 'SELECT * FROM design_videos' . ($publishedOnly ? ' WHERE is_visible = 1 AND consent_confirmed = 1' : '') . ' ORDER BY sort_order, id';
     return db()->query($sql)->fetchAll();
 }
 
@@ -75,19 +76,18 @@ function format_mb(int $bytes): string
     return rtrim(rtrim(number_format($bytes / 1048576, 1), '0'), '.') . ' MB';
 }
 
-/** Validate the name/service/caption/consent fields. */
+/** Validate the title/category/caption/permission fields. */
 function video_fields(array $in): array
 {
     $f = [
-        'client_name' => clean_line($in['client_name'] ?? '', 80),
-        'service'     => (string) ($in['service'] ?? ''),
-        'caption'     => trim(clean_line($in['caption'] ?? '', VIDEO_MAX_CAPTION + 20), " \"'“”‘’"),
-        'consent'     => !empty($in['consent']) ? 1 : 0,
+        'title'    => clean_line($in['title'] ?? '', VIDEO_MAX_TITLE),
+        'category' => (string) ($in['category'] ?? ''),
+        'caption'  => mb_substr(clean_line($in['caption'] ?? '', VIDEO_MAX_CAPTION + 20), 0, VIDEO_MAX_CAPTION),
+        'consent'  => !empty($in['consent']) ? 1 : 0,
     ];
-    $f['caption'] = mb_substr($f['caption'], 0, VIDEO_MAX_CAPTION);
-    if ($f['client_name'] === '') throw new RuntimeException('Please enter the client’s name as they would like it shown (e.g. “Adaeze O.”).');
-    if (!isset(TESTIMONIAL_SERVICES[$f['service']])) throw new RuntimeException('Please choose the service.');
-    if (!$f['consent']) throw new RuntimeException('Please confirm the client agreed to have this video shown on the website.');
+    if ($f['title'] === '') throw new RuntimeException('Please give the video a title, e.g. “Emerald Lace Aso-Ebi”.');
+    if (!isset(GALLERY_CATEGORIES[$f['category']])) throw new RuntimeException('Please choose a category.');
+    if (!$f['consent']) throw new RuntimeException('Please confirm the client agreed to this video being shown on the website.');
     return $f;
 }
 
@@ -100,9 +100,9 @@ function store_video_upload(array $video, ?array $poster): array
     $limit = video_upload_limit();
     $err = $video['error'] ?? UPLOAD_ERR_NO_FILE;
     if ($err === UPLOAD_ERR_NO_FILE) throw new RuntimeException('Please choose a video to upload.');
-    if ($err === UPLOAD_ERR_INI_SIZE || $err === UPLOAD_ERR_FORM_SIZE) throw new RuntimeException('That video is larger than ' . format_mb($limit) . '. Please trim it or send a shorter clip.');
+    if ($err === UPLOAD_ERR_INI_SIZE || $err === UPLOAD_ERR_FORM_SIZE) throw new RuntimeException('That video is larger than ' . format_mb($limit) . '. Please trim it or use a shorter clip.');
     if ($err !== UPLOAD_ERR_OK || !is_uploaded_file($video['tmp_name'])) throw new RuntimeException('The video could not be uploaded. Please try again.');
-    if ($video['size'] > $limit) throw new RuntimeException('That video is larger than ' . format_mb($limit) . '. Please trim it or send a shorter clip.');
+    if ($video['size'] > $limit) throw new RuntimeException('That video is larger than ' . format_mb($limit) . '. Please trim it or use a shorter clip.');
 
     $mime = (new finfo(FILEINFO_MIME_TYPE))->file($video['tmp_name']) ?: '';
     if ($mime === 'application/octet-stream' && preg_match('/\.(mp4|m4v|mov)$/i', (string) $video['name'])) {

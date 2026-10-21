@@ -329,13 +329,13 @@ How it works:
 - **Management:** reorder with ↑ / ↓, hide or show, edit or remove. Quotation marks typed around a quote are removed automatically, because the design adds its own.
 - **On the site:** the carousel loads published testimonials from `api/testimonials.php` and replaces the three placeholder slides. With none published, the placeholders stay. With one, the arrows and dots are hidden.
 
-**Video testimonials (`admin/videos.php`).** The owner uploads short client videos for the "Client Stories" section on the Home page.
+**Videos (`admin/videos.php`).** The owner uploads short videos of clients wearing Reign Fashion designs. They appear in the "In Motion" section on the Home and Collections pages.
 
-- **Upload:** an MP4, MOV or WebM file (a video saved from WhatsApp or a phone works), the client's name, the service, an optional one-line quote, and the permission tick. Videos go up to 60 MB, or less if the server's PHP limits are lower; the page shows the real limit.
+- **Upload:** an MP4, MOV or WebM file (a video saved from WhatsApp or a phone works), a title (e.g. "Emerald Lace Aso-Ebi"), a gallery category, an optional caption, and a tick confirming the client agreed to be shown. Videos go up to 60 MB, or less if the server's PHP limits are lower; the page shows the real limit.
 - **In the browser:** the admin page previews the video, reads its length, grabs a cover image from it, checks the size before sending, and uploads in the background with a progress bar.
 - **On the server:** files are checked by their real content and saved under random names in `assets/uploads/videos/`. That folder only serves image and video files.
 - **Upload limits:** `admin/.htaccess` (Apache mod_php, XAMPP) and `admin/.user.ini` (PHP-FPM/LiteSpeed, typical cPanel) raise PHP's limits for the admin folder only. A video over the limit gets a clear message rather than a "session expired" error.
-- **Database:** the `video_testimonials` table is created automatically the first time the page or `api/videos.php` runs, so the live site needs no SQL step. It's also in `schema.sql`.
+- **Database:** the `design_videos` table is created automatically the first time the page or `api/videos.php` runs, so the live site needs no SQL step. It's also in `schema.sql`.
 - **On the site:** `api/videos.php` lists the published videos (visible, with permission). The section stays hidden until there is one. Videos load only when played, only one plays at a time, and phones get a swipeable row.
 
 **Admin accounts are created from the command line:**

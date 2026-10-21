@@ -1,6 +1,7 @@
 <?php
 /**
- * GET api/videos.php — published video testimonials for the "Client Stories" section.
+ * GET api/videos.php — published design videos for the "In Motion" section
+ * (Home and Collections pages).
  */
 declare(strict_types=1);
 
@@ -13,14 +14,15 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
 
 try {
     $items = array_map(fn($v) => [
-        'name'         => $v['client_name'],
-        'serviceLabel' => TESTIMONIAL_SERVICES[$v['service']] ?? '',
-        'caption'      => $v['caption'],
-        'src'          => $v['video_path'],
-        'type'         => $v['mime'] === 'video/quicktime' ? 'video/mp4' : $v['mime'],   // MOV from phones is H.264; browsers play it as MP4
-        'poster'       => $v['poster_path'],
-        'duration'     => format_duration($v['duration_seconds'] !== null ? (int) $v['duration_seconds'] : null),
-    ], video_testimonials(true));
+        'title'         => $v['title'],
+        'category'      => $v['category'],
+        'categoryLabel' => GALLERY_CATEGORIES[$v['category']] ?? '',
+        'caption'       => $v['caption'],
+        'src'           => $v['video_path'],
+        'type'          => $v['mime'] === 'video/quicktime' ? 'video/mp4' : $v['mime'],   // MOV from phones is H.264; browsers play it as MP4
+        'poster'        => $v['poster_path'],
+        'duration'      => format_duration($v['duration_seconds'] !== null ? (int) $v['duration_seconds'] : null),
+    ], design_videos(true));
 } catch (Throwable $e) {
     error_log('Videos API failed: ' . $e->getMessage());
     json_response(500, ['ok' => false, 'error' => 'Videos unavailable.']);
