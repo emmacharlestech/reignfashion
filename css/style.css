@@ -2057,19 +2057,48 @@ body.menu-open .wordmark:focus-visible { outline-color: var(--c-gold); }
    -------------------------------------------------------------------------- */
 .motion[hidden] { display: none; }
 .motion .section-head { margin-bottom: var(--space-7); }
-.motion__grid {
+.motion .motion__grid {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: min(78%, 20rem);
+  grid-auto-columns: min(80%, 20rem);
   gap: var(--space-4);
+  /* The row runs to the screen edges; cards still line up with the text */
+  margin-inline: calc(var(--gutter) * -1);
+  padding-inline: var(--gutter);
+  scroll-padding-inline: var(--gutter);
   overflow-x: auto;
+  overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
-  padding-bottom: var(--space-3);
-  scrollbar-width: thin;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
+.motion__grid::-webkit-scrollbar { display: none; }
+/* A single video fills the width (up to a comfortable size), centred */
+.motion__grid[data-count="1"] { grid-auto-columns: min(100%, 24rem); justify-content: center; }
+.motion__dots { display: flex; justify-content: center; gap: var(--space-1); margin-top: var(--space-4); }
+.motion__dot {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.motion__dot::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(10, 61, 46, 0.25);
+  transition: width var(--dur) var(--ease), background-color var(--dur) var(--ease);
+}
+.motion__dot[aria-current="true"]::before { width: 24px; background: var(--c-gold-deep); }
+.motion__dot:focus-visible { outline: 2px solid var(--c-gold); outline-offset: 2px; border-radius: 6px; }
 .motion-card { scroll-snap-align: start; display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; }
 .motion-card__media {
   position: relative;
@@ -2129,16 +2158,18 @@ body.menu-open .wordmark:focus-visible { outline-color: var(--c-gold); }
 .motion-card__meta { font-size: 0.8125rem; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--c-gold-deep); }
 
 @media (min-width: 48rem) {
-  .motion__grid {
+  .motion .motion__grid {
     grid-auto-flow: row;
     grid-auto-columns: auto;
     /* Cards up to 20rem wide; a row that isn't full stays centred */
     grid-template-columns: repeat(auto-fit, minmax(15rem, 20rem));
     justify-content: center;
     gap: var(--space-6) var(--space-5);
+    margin-inline: 0;
+    padding-inline: 0;
     overflow: visible;
-    padding-bottom: 0;
   }
+  .motion__dots { display: none; }
 }
 
 /* --------------------------------------------------------------------------

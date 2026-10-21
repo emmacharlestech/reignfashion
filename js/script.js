@@ -704,10 +704,48 @@
         if (v.caption) li.append(mk('p', 'motion-card__caption', v.caption));
         return li;
       }));
+      grid.dataset.count = String(items.length);
       section.hidden = false;
+      if (items.length > 1) addMotionDots(grid);
     } catch (err) {
       console.info('Design videos unavailable.', err);
     }
+  }
+
+  // Phones show the videos as a swipeable row: dots under it say how many
+  // there are and which is in view, and jump to a video when tapped.
+  // (Hidden by CSS from tablet width up, where the videos sit in a grid.)
+  function addMotionDots(grid) {
+    const cards = [...grid.children];
+    const nav = document.createElement('div');
+    nav.className = 'motion__dots';
+    nav.setAttribute('role', 'group');
+    nav.setAttribute('aria-label', 'Choose a video');
+    const dots = cards.map((card, i) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'motion__dot';
+      dot.setAttribute('aria-label', `Video ${i + 1} of ${cards.length}`);
+      dot.addEventListener('click', () => {
+        grid.scrollTo({ left: card.offsetLeft - cards[0].offsetLeft, behavior: prefersReducedMotion.matches ? 'auto' : 'smooth' });
+      });
+      return dot;
+    });
+    nav.append(...dots);
+    grid.after(nav);
+
+    const update = () => {
+      const step = cards[1].offsetLeft - cards[0].offsetLeft || 1;
+      const atEnd = grid.scrollLeft >= grid.scrollWidth - grid.clientWidth - 2;
+      const current = atEnd ? cards.length - 1 : Math.round(grid.scrollLeft / step);
+      dots.forEach((d, i) => d.setAttribute('aria-current', i === current ? 'true' : 'false'));
+    };
+    let frame = 0;
+    grid.addEventListener('scroll', () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(update);
+    }, { passive: true });
+    update();
   }
 
   /* ------------------------------------------------------------------------
