@@ -420,3 +420,31 @@ h1, h2, h3 { color: var(--ink); margin: 0; }
 .upload-progress__bar { height: 10px; border-radius: 999px; background: var(--ivory-deep); overflow: hidden; }
 .upload-progress__bar span { display: block; height: 100%; width: 0; background: var(--gold); transition: width .2s; }
 .upload-progress__text { margin: 0; }
+
+/* Page editor */
+.plist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+@media (min-width: 760px) { .plist { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.plist__link {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 64px; padding: 14px 18px;
+  background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); text-decoration: none;
+}
+.plist__link:hover { border-color: var(--gold-deep); box-shadow: 0 8px 20px -14px rgba(6, 42, 31, .4); }
+.plist__name { font-weight: 600; font-size: 16px; color: var(--ink); }
+.plist__meta { font-size: 13px; color: var(--muted); }
+.ptips { margin: 0 0 16px; font-size: 14px; }
+.ptips code { padding: 1px 6px; border-radius: 4px; background: var(--ivory-deep); font-size: 13px; }
+.psec { margin-bottom: 10px; padding: 0; }
+.psec__summary { display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 12px 20px; cursor: pointer; }
+.psec__title { font-weight: 600; font-size: 16px; color: var(--ink); }
+.psec[open] .psec__summary { border-bottom: 1px solid var(--line); }
+.psec__form { padding: 16px 20px 0; }
+.pfield__head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.pfield.is-changed input, .pfield.is-changed textarea { border-color: var(--gold); }
+.pfield textarea { min-height: 0; field-sizing: content; max-height: 60vh; }   /* grows with its text where supported */
+.pfield__reset { padding: 0; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 600; color: var(--green); text-decoration: underline; cursor: pointer; }
+.pfield__label { margin: 0; font-weight: 600; font-size: 14px; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+.pphoto { display: grid; gap: 14px; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+.pphoto__current { width: 120px; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); background: var(--ivory-deep); }
+.pphoto__fields { display: grid; gap: 12px; min-width: 0; }
+.pphoto__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+@media (min-width: 600px) { .pphoto { grid-template-columns: 140px minmax(0, 1fr); } .pphoto__current { width: 140px; } }

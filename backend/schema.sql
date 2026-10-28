@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS academy_registrations (
   INDEX idx_ip_created (ip_hash, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Design videos ("In Motion": clients wearing Reign Fashion designs), managed in admin/videos.php.
+-- Design videos ("In Motion": clients wearing Reign Fashion Empire designs), managed in admin/videos.php.
 -- Also created automatically on first use (backend/videos.php), so the live site needs no manual step.
 CREATE TABLE IF NOT EXISTS design_videos (
   id                 INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -129,4 +129,15 @@ CREATE TABLE IF NOT EXISTS design_videos (
   sort_order         INT          NOT NULL DEFAULT 0,
   created_at         DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_visible_order (is_visible, sort_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Page editor: the owner's changes to text and photos on the website pages, managed in admin/pages.php.
+-- Keys match the data-edit attributes in the HTML (tools/mark-editable.js); page.php applies them.
+-- Also created automatically on first use (backend/pages.php), so the live site needs no manual step.
+CREATE TABLE IF NOT EXISTS page_content (
+  page        VARCHAR(40)  NOT NULL,                   -- file name without .html, e.g. about
+  edit_key    VARCHAR(60)  NOT NULL,                   -- data-edit key, e.g. founder-t3
+  value       TEXT         NOT NULL,                   -- plain text (*italic*, **bold**), or JSON for a photo
+  updated_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (page, edit_key)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

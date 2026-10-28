@@ -9,6 +9,7 @@
     const input = form.querySelector('input[type="file"]');
     const preview = form.querySelector('.upload__preview');
     const submit = form.querySelector('button[type="submit"]');
+    const label = submit.textContent;
     let ready = Promise.resolve();
 
     input.addEventListener('change', () => {
@@ -44,7 +45,7 @@
           console.info('In-browser resize unavailable; uploading original.', err);
         } finally {
           submit.disabled = false;
-          submit.textContent = 'Upload design';
+          submit.textContent = label;
         }
       })();
     });
@@ -54,6 +55,10 @@
       e.preventDefault();
       await ready;
       form.dataset.sending = '1';
+      // form.submit() leaves out the pressed button, so carry its name/value over
+      if (e.submitter?.name) {
+        form.append(Object.assign(document.createElement('input'), { type: 'hidden', name: e.submitter.name, value: e.submitter.value }));
+      }
       submit.disabled = true;
       submit.textContent = 'Uploading…';
       form.submit();

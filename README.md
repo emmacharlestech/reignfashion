@@ -338,6 +338,14 @@ How it works:
 - **Database:** the `design_videos` table is created automatically the first time the page or `api/videos.php` runs, so the live site needs no SQL step. It's also in `schema.sql`.
 - **On the site:** `api/videos.php` lists the published videos (visible, with permission). The section stays hidden until there is one. Videos load only when played, only one plays at a time, and phones get a swipeable row.
 
+**Pages (`admin/pages.php`).** The owner changes the wording and photos on every page, section by section.
+
+- **What's editable:** headings, paragraphs, list items, button text, captions, FAQ questions and photos (with their description) inside `<main>`. Each carries a `data-edit="key"` attribute. Anything the site's JavaScript fills in (gallery, testimonials, videos, forms, contact details) is left out. Header and footer come from `tools/build-layout.js` and Settings.
+- **Formatting:** text is plain. `*word*` shows in italic (gold in headings), `**word**` in bold, and a new line becomes a line break. Nothing else is turned into HTML, so pasted code can't break the page.
+- **Storage:** the HTML files keep the original content. Changes are saved in the `page_content` table (created automatically, also in `schema.sql`), and "Restore original" deletes them. Because edits live in the database, uploading a new version of the site never overwrites them.
+- **Serving:** `.htaccess` sends clean addresses (`/about`) to `page.php`, which applies the saved changes to `about.html`. If the database is down, the page is served exactly as the file is.
+- **New content:** after adding text or photos to a page, run `node tools/mark-editable.js` to make them editable. Existing keys are kept, so saved changes stay attached. A saved change whose element was removed from the page is simply ignored.
+
 **Admin accounts are created from the command line:**
 
 ```

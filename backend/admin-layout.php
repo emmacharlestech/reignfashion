@@ -36,7 +36,7 @@ function admin_header(string $title, ?array $admin = null, string $active = ''):
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
-  <title><?= e($title) ?> · Reign Fashion Admin</title>
+  <title><?= e($title) ?> · Reign Fashion Empire Admin</title>
   <link rel="icon" href="../assets/favicon-48.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
@@ -47,7 +47,7 @@ function admin_header(string $title, ?array $admin = null, string $active = ''):
   <header class="topbar">
     <a href="./" class="topbar__brand">
       <img src="../assets/images/brand/logo-mark-mask.png" alt="" width="40" height="29">
-      <span>Reign Fashion <em>Admin</em></span>
+      <span>Reign Fashion Empire <em>Admin</em></span>
     </a>
     <button type="button" class="topbar__toggle" aria-expanded="false" aria-controls="admin-nav">
       <span class="topbar__toggle-bars" aria-hidden="true"></span>
@@ -55,6 +55,7 @@ function admin_header(string $title, ?array $admin = null, string $active = ''):
     </button>
     <nav class="topbar__nav" id="admin-nav" aria-label="Admin">
       <a href="./" <?= $active === 'dashboard' ? 'aria-current="page"' : '' ?>>Dashboard</a>
+      <a href="pages" <?= $active === 'pages' ? 'aria-current="page"' : '' ?>>Pages</a>
       <a href="enquiries" <?= $active === 'inbox' ? 'aria-current="page"' : '' ?>>Enquiries</a>
       <a href="academy" <?= $active === 'academy' ? 'aria-current="page"' : '' ?>>Academy</a>
       <a href="gallery" <?= $active === 'gallery' ? 'aria-current="page"' : '' ?>>Gallery</a>
