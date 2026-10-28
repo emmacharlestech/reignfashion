@@ -114,7 +114,7 @@ admin_header('Gallery', $admin, 'gallery');
         <div class="field field--full">
           <label for="u-photo">Photo</label>
           <input id="u-photo" type="file" name="photo" accept="image/jpeg,image/png,image/webp" required aria-describedby="u-photo-h">
-          <small id="u-photo-h" class="field__help">JPG, PNG or WebP. Large photos are resized automatically before uploading. Only upload Reign Fashion's own work.</small>
+          <small id="u-photo-h" class="field__help">JPG, PNG or WebP. Large photos are resized automatically before uploading. Only upload Reign Fashion Empire's own work.</small>
           <img class="upload__preview" alt="" hidden>
         </div>
         <div class="field"><label for="u-title">Title</label>

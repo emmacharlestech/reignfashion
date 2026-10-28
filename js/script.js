@@ -24,12 +24,12 @@
 
     email: 'reignfashionempire@gmail.com',
     address: 'Anni Victor Plaza, Old Anwai Road, opposite Dwell Petrol Filling Station, Asaba, Delta State',
-    hours: '',          // e.g. 'Mon–Sat, 9am–6pm' (not yet provided)
+    hours: '8:00am – 6:00pm',
 
     // For each network: `url` is the full profile link (makes it clickable);
     // `name` is the account name shown as plain text until the link is known.
     social: {
-      instagram: { url: 'https://www.instagram.com/reign_fashion_empire/', name: '@Reign-Fashion-Empire' },
+      instagram: { url: 'https://www.instagram.com/reign_fashion_empire/', name: '@reign_fashion_empire' },
       facebook:  { url: 'https://www.facebook.com/Reign-Fashion-Empire',  name: '@Reign-Fashion-Empire' },
       tiktok:    { url: 'https://www.tiktok.com/@reignfashionacademy',    name: '@#Reign-Fashion-Academy Asaba' },
     },
@@ -677,7 +677,7 @@
         source.src = v.src;
         if (v.type) source.type = v.type;
         video.append(source);
-        const label = `${v.categoryLabel || 'Reign Fashion'} video`;
+        const label = `${v.categoryLabel || 'Reign Fashion Empire'} video`;
         video.setAttribute('aria-label', v.caption ? `${label}: ${v.caption}` : label);
 
         const play = mk('button', 'motion-card__play');
@@ -916,13 +916,13 @@
 
   function waGreeting(service, design) {
     const topic = SERVICE_PHRASES[service] ?? 'your fashion design services';
-    let msg = `Hello Reign Fashion, I would like to make an enquiry about ${topic}.`;
+    let msg = `Hello Reign Fashion Empire, I would like to make an enquiry about ${topic}.`;
     if (design) msg += ` I'm interested in "${design}".`;
     return msg;
   }
 
   // Remembers the chosen service/design, so re-rendering (e.g. when live
-  // settings arrive) keeps the tailored WhatsApp message.
+  // settings arrive) keeps the personalized WhatsApp message.
   const waChoice = { service: '', design: '' };
 
   function updateWhatsAppLinks(service = waChoice.service, design = waChoice.design) {
@@ -953,6 +953,9 @@
     let allSet = true;
     document.querySelectorAll('[data-academy]').forEach((dd) => {
       const value = (a[dd.dataset.academy] ?? '').trim();
+      // Optional rows (e.g. "Next intake" under the timetable) stay hidden until set
+      const row = dd.closest('[data-academy-row]');
+      if (row) row.hidden = !value;
       dd.textContent = value || 'To be confirmed';
       dd.classList.toggle('is-pending', !value);
       if (!value) allSet = false;
@@ -1006,8 +1009,7 @@
         if (!d) return 'Please enter a phone number so we can reach you.';
         return d.length >= 7 && d.length <= 15 ? '' : 'Please enter a valid phone number.';
       }],
-      level: ['#a-level', () => ($('#a-level').value ? '' : 'Please choose the level that suits you.')],
-      schedule: ['input[name="schedule"]', () => (form.querySelector('input[name="schedule"]:checked') ? '' : 'Please choose when you would prefer to attend.')],
+      level: ['#a-level', () => ($('#a-level').value ? '' : 'Please choose your programme.')],
       consent: ['input[name="consent"]', () => ($('input[name="consent"]').checked ? '' : 'Please confirm that we may use your details to contact you.')],
     };
 
@@ -1029,6 +1031,11 @@
       status.focus({ preventScroll: true });
       status.scrollIntoView({ behavior: prefersReducedMotion.matches ? 'auto' : 'smooth', block: 'nearest' });
     }
+
+    // "Apply Now" on a programme card preselects that programme in the form
+    document.querySelectorAll('a[data-programme]').forEach((a) => {
+      a.addEventListener('click', () => { $('#a-level').value = a.dataset.programme; });
+    });
 
     form.addEventListener('input', () => { if (attempted) validate(); });
     form.addEventListener('change', () => { if (attempted) validate(); });
@@ -1069,7 +1076,7 @@
         ]);
       } finally {
         submit.disabled = false;
-        submit.textContent = 'Register';
+        submit.textContent = 'Submit Application';
       }
     });
   }
@@ -1269,7 +1276,7 @@
     function summary() {
       const data = new FormData(form);
       const lines = [
-        'Hello Reign Fashion, I would like to make an enquiry.',
+        'Hello Reign Fashion Empire, I would like to make an enquiry.',
         '',
         `Name: ${data.get('name')}`,
         `Service: ${serviceLabel()}`,
@@ -1288,7 +1295,7 @@
         actions.push(el('a', { className: 'btn btn--dark btn--sm', href: waHref(summary()), target: '_blank', rel: 'noopener' }, 'Send via WhatsApp'));
       }
       if (SITE_CONFIG.email) {
-        const subject = `Enquiry: ${serviceLabel() || 'Reign Fashion'}`;
+        const subject = `Enquiry: ${serviceLabel() || 'Reign Fashion Empire'}`;
         actions.push(el('a', {
           className: 'btn btn--outline btn--sm',
           href: `mailto:${SITE_CONFIG.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(summary())}`,
@@ -1328,7 +1335,7 @@
           'Online sending is not connected on this website yet, so your details have not been submitted.',
           actions.length
             ? 'Please use one of the options below to send it now. Your details are included automatically.'
-            : 'Reign Fashion\'s contact details will be published here soon. Please keep your notes and try again later.',
+            : 'Reign Fashion Empire\'s contact details will be published here soon. Please keep your notes and try again later.',
         ], actions);
         return;
       }
@@ -1358,6 +1365,7 @@
           bad[0]?.focus();
           return;
         }
+
         // Too many attempts, or any other server-reported problem
         if (!res.ok) {
           if (data.error) {
@@ -1377,7 +1385,7 @@
         updateWhatsAppLinks('', '');   // form sent: back to the general message
         showStatus('success', `Thank you, ${firstName}. Your enquiry has been sent.`, [
           ...(data.ref ? [`Your reference number is ${data.ref}. Please quote it if you contact us about this enquiry.`] : []),
-          'The Reign Fashion team will be in touch using your preferred contact method.',
+          'The Reign Fashion Empire team will be in touch using your preferred contact method.',
         ]);
       } catch (err) {
         console.error('Enquiry form submission failed:', err);

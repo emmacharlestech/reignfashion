@@ -1,6 +1,6 @@
 <?php
 /**
- * Design videos ("In Motion"): clients wearing Reign Fashion designs.
+ * Design videos ("In Motion"): clients wearing Reign Fashion Empire designs.
  * Storage, uploads and queries. Videos and their cover images are saved under
  * assets/uploads/videos/, which only ever serves video and image files
  * (see assets/uploads/.htaccess).

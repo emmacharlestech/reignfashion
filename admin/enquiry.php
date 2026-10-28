@@ -63,7 +63,7 @@ $wa = $enq['phone'] ? whatsapp_digits($enq['phone']) : '';
 $firstName = explode(' ', $enq['name'])[0];
 $service = SERVICES[$enq['service']] ?? $enq['service'];
 $waText = "Hello $firstName, thank you for your enquiry ({$enq['ref']}) about " . strtolower($service) . ' with Reign Fashion Empire.';
-$mailSubject = "Your Reign Fashion enquiry {$enq['ref']}";
+$mailSubject = "Your Reign Fashion Empire enquiry {$enq['ref']}";
 
 admin_header($enq['ref'] . ' · ' . $enq['name'], $admin, 'inbox');
 ?>

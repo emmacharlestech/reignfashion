@@ -107,24 +107,24 @@ const PAGES = [
       ['Ready-to-Wear', 'Stylish, effortless outfits designed for everyday elegance.'],
     ],
     cta: 'Book a Consultation', extra: womenLines,
-    galleryTitle: "Women's <em>Designs</em>", galleryLead: 'Bridal gowns, Aso-Ebi and ready-to-wear from the Reign Fashion studio.',
+    galleryTitle: "Women's <em>Designs</em>", galleryLead: 'Bridal gowns, Aso-Ebi and ready-to-wear from the Reign Fashion Empire studio.',
   },
   {
     key: 'men', file: 'men.html', crumb: "Men's Collection", include: 'men', service: 'men',
     title: "Men's Collection | Reign Fashion Empire, Asaba",
-    description: "Fashionable men's wear made to measure in Asaba: traditional attire, tailored looks and occasion outfits by Reign Fashion Empire.",
+    description: "Fashionable men's wear made to measure in Asaba: traditional attire, bespoke fashion designing and occasion outfits by Reign Fashion Empire.",
     banner: ["Men's <em>Collection</em>", 'Fashionable menswear, from sharp contemporary looks to traditional attire, made to your measure.'],
     image: { src: 'assets/images/collection-men.webp', alt: 'Man in a navy checked suit with a pocket square', w: 900, h: 1350, sample: true },
-    introTitle: 'Sharp, Tailored, <em>Yours</em>',
+    introTitle: 'Sharp Fashion Designing, <em>Yours</em>',
     introLead: 'Menswear cut to your measurements and finished with care, for celebrations, ceremonies and everyday style.',
     offers: [
       ['Traditional Attire', 'Traditional outfits made to your measure for weddings, ceremonies and celebrations.'],
-      ['Tailored &amp; Contemporary Looks', 'Sharp, modern pieces cut to fit you perfectly.'],
+      ['Bespoke Fashion Designing &amp; Contemporary Looks', 'Sharp, modern pieces crafted to fit you perfectly.'],
       ['Occasion Wear', 'Standout outfits for weddings and special events.'],
       ['Matching Family Looks', 'Coordinate with your partner or family in matching Aso-Ebi.'],
     ],
     cta: "Order Men's Wear",
-    galleryTitle: "Men's <em>Designs</em>", galleryLead: 'A selection of menswear looks from the Reign Fashion studio.',
+    galleryTitle: "Men's <em>Designs</em>", galleryLead: 'A selection of menswear looks from the Reign Fashion Empire studio.',
   },
   {
     key: 'kids', file: 'kids.html', crumb: "Kiddies' Collection", include: 'kids', service: 'kids',
@@ -141,7 +141,7 @@ const PAGES = [
       ['Everyday Style', 'Stylish pieces for every day in between.'],
     ],
     cta: "Order Kiddies' Wear",
-    galleryTitle: "Kiddies' <em>Designs</em>", galleryLead: 'A selection of children’s looks from the Reign Fashion studio.',
+    galleryTitle: "Kiddies' <em>Designs</em>", galleryLead: 'A selection of children’s looks from the Reign Fashion Empire studio.',
   },
 ];
 

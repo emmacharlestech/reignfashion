@@ -34,7 +34,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors['email'] = 'Please enter
 $digits = preg_replace('/\D/', '', $phone) ?? '';
 if ($phone === '')                              $errors['phone'] = 'Please enter a phone number so we can reach you.';
 elseif (strlen($digits) < 7 || strlen($digits) > 15) $errors['phone'] = 'Please enter a valid phone number.';
-if (!isset(ACADEMY_LEVELS[$level]))             $errors['level'] = 'Please choose the level that suits you.';
+if (!isset(ACADEMY_LEVELS[$level]))             $errors['level'] = 'Please choose your programme.';
 if (!isset(ACADEMY_SCHEDULES[$schedule]))       $errors['schedule'] = 'Please choose when you would prefer to attend.';
 if (!$consent)                                  $errors['consent'] = 'Please confirm that we may use your details to contact you.';
 

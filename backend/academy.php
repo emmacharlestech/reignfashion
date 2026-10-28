@@ -7,8 +7,8 @@ declare(strict_types=1);
 require_once __DIR__ . '/bootstrap.php';
 
 const ACADEMY_LEVELS = [
-    'beginner'     => 'Beginner',
-    'intermediate' => 'Intermediate',
+    'beginner'     => 'Beginners to Advanced (6 months)',
+    'intermediate' => 'Upgrade: Intermediate & Advanced (4 months)',
     'advanced'     => 'Advanced',
     'professional' => 'Professional Mastery',
 ];

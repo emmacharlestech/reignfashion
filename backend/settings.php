@@ -21,8 +21,8 @@ const SETTING_DEFS = [
     'address'         => ['contact', 'Studio address', 'textarea', 'Anni Victor Plaza, Old Anwai Road, opposite Dwell Petrol Filling Station, Asaba, Delta State', 250, 'Also used for the "Get directions" map link.'],
     'hours'           => ['contact', 'Opening hours', 'text', '', 120, 'e.g. Mon–Sat, 9am–6pm. Leave empty to show "To be confirmed".'],
     // Social
-    'instagram_url'   => ['social', 'Instagram profile link', 'url:instagram.com', '', 200, 'Copy from the browser address bar on the profile, e.g. https://www.instagram.com/yourname'],
-    'instagram_name'  => ['social', 'Instagram account name', 'text', 'Reign Fashion Empire', 80, 'Shown as text until the link is added.'],
+    'instagram_url'   => ['social', 'Instagram profile link', 'url:instagram.com', 'https://www.instagram.com/reign_fashion_empire/', 200, 'Copy from the browser address bar on the profile, e.g. https://www.instagram.com/yourname'],
+    'instagram_name'  => ['social', 'Instagram account name', 'text', '@reign_fashion_empire', 80, 'Shown as text until the link is added.'],
     'facebook_url'    => ['social', 'Facebook page link', 'url:facebook.com|fb.com', '', 200, 'e.g. https://www.facebook.com/yourpage'],
     'facebook_name'   => ['social', 'Facebook page name', 'text', 'Reign Fashion Empire', 80, ''],
     'tiktok_url'      => ['social', 'TikTok profile link', 'url:tiktok.com', '', 200, 'e.g. https://www.tiktok.com/@yourname'],

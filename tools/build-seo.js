@@ -14,6 +14,7 @@ const path = require('path');
 const SITE = 'https://reignfashionempire.com/';
 const BUSINESS = {
   name: 'Reign Fashion Empire',
+  alternateName: 'Reignfashionempire',
   telephone: ['+2348135759554', '+2349071717484'],
   email: 'reignfashionempire@gmail.com',
   street: 'Anni Victor Plaza, Old Anwai Road, opposite Dwell Petrol Filling Station',
@@ -54,10 +55,11 @@ const business = {
   '@type': 'ClothingStore',
   '@id': SITE + '#business',
   name: BUSINESS.name,
+  alternateName: BUSINESS.alternateName,
   url: SITE,
   logo: SITE + 'assets/images/brand/logo-full-gold.png',
   image: SITE + 'assets/images/brand/og-image.jpg',
-  description: 'Fashion design house in Asaba creating wedding gowns, Aso-Ebi, ready-to-wear, kiddies\' and men\'s wear, with professional fashion training at the Reign Fashion Academy.',
+  description: 'Premier fashion designing house and haute couture atelier in Asaba creating bespoke wedding gowns, luxury Aso-Ebi, stylish ready-to-wear, kiddies\' and men\'s wear, with professional fashion designing training at the Reign Fashion Academy.',
   slogan: 'Your Style, Our Creativity, Our Passion.',
   telephone: BUSINESS.telephone[0],
   email: BUSINESS.email,

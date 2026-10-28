@@ -15,7 +15,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         $problem = alert_problem();
         if ($problem !== '') {
             flash($problem, 'error');
-        } elseif (send_admin_alert('Test alert from the Reign Fashion admin',
+        } elseif (send_admin_alert('Test alert from the Reign Fashion Empire admin',
             "This is a test. Alerts for new enquiries and Academy registrations will arrive at this address.\n\n" . admin_link(''))) {
             flash('Test email sent to ' . alert_recipient() . '. If it is not in the inbox within a few minutes, check the spam folder.');
         } else {
