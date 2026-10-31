@@ -88,8 +88,8 @@ const homeCta = `    <!-- ======================================================
 const PAGES = [
   {
     file: 'index.html', nav: 'home', crumb: null,
-    title: 'Reign Fashion Empire | Wedding Gowns, Aso-Ebi &amp; Fashion Academy in Asaba',
-    description: "Reign Fashion Empire, Asaba: elegant wedding gowns, beautiful Aso-Ebi, stylish ready-to-wear, kiddies' and men's wear, plus professional fashion training at the Reign Fashion Academy.",
+    title: 'Fashion Designer in Asaba | Reign Fashion Empire',
+    description: 'Reign Fashion Empire creates bespoke wedding gowns, Aso-Ebi and made-to-measure fashion in Asaba, Delta State. Explore our designs and book a consultation.',
     body: () => [section('home'), section('collections'), section('testimonials'), homeCta],
     seo: 'business',
   },
@@ -119,9 +119,9 @@ const PAGES = [
   },
   {
     file: 'academy.html', nav: 'academy',
-    title: 'Reign Fashion Academy, Asaba | Fashion Design Training',
-    description: 'Professional fashion training in Asaba from beginner to professional mastery: sewing, pattern drafting, garment construction, Aso-Ebi and bridal gown production.',
-    body: () => [banner('Academy', 'Reign Fashion Academy', 'Learn the <em>Craft</em>', 'Professional fashion training for aspiring designers, from your first stitch to professional mastery.'),
+    title: 'Fashion Academy in Delta State | Reign Fashion Academy',
+    description: 'Learn fashion design at Reign Fashion Academy, Asaba, Delta State. Full-time courses cover sewing, pattern drafting, garment construction, bridal and Aso-Ebi.',
+    body: () => [banner('Academy', 'Fashion Academy · Asaba, Delta State', 'Fashion Design <em>Training in Asaba</em>', 'Build practical fashion design skills at Reign Fashion Academy in Asaba, Delta State, from sewing and pattern drafting to garment construction and bridal couture.'),
       section('academy')],
   },
   {
