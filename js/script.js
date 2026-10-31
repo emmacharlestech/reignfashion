@@ -672,7 +672,7 @@
         video.preload = 'none';
         video.playsInline = true;
         video.setAttribute('playsinline', '');
-        if (v.poster) video.poster = v.poster;
+        if (v.poster) video.dataset.poster = v.poster;
         const source = document.createElement('source');
         source.src = v.src;
         if (v.type) source.type = v.type;
@@ -686,7 +686,13 @@
         const icon = mk('span', 'motion-card__play-icon');
         icon.append(playIcon());
         play.append(icon);
+        const loadPoster = () => {
+          if (!video.dataset.poster) return;
+          video.poster = video.dataset.poster;
+          delete video.dataset.poster;
+        };
         play.addEventListener('click', () => {
+          loadPoster();
           li.classList.add('is-playing');
           video.controls = true;
           video.play().catch(() => {});
@@ -706,6 +712,23 @@
       }));
       grid.dataset.count = String(items.length);
       section.hidden = false;
+      const videos = grid.querySelectorAll('video[data-poster]');
+      if ('IntersectionObserver' in window) {
+        const posterObserver = new IntersectionObserver((entries, observer) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.poster = entry.target.dataset.poster;
+            delete entry.target.dataset.poster;
+            observer.unobserve(entry.target);
+          });
+        }, { rootMargin: '400px 0px' });
+        videos.forEach((video) => posterObserver.observe(video));
+      } else {
+        videos.forEach((video) => {
+          video.poster = video.dataset.poster;
+          delete video.dataset.poster;
+        });
+      }
       if (items.length > 1) addMotionDots(grid);
     } catch (err) {
       console.info('Design videos unavailable.', err);
@@ -770,7 +793,6 @@
       };
       track.replaceChildren(...items.map((t) => {
         const li = mk('li', 'carousel__slide');
-        li.setAttribute('role', 'group');
         li.setAttribute('aria-roledescription', 'slide');
         const fig = mk('figure', 'testimonial');
         const quote = mk('blockquote', 'testimonial__quote');
