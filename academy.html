@@ -238,8 +238,8 @@
             <dl class="programme__facts">
               <div><dt data-edit="programmes-t5">Duration</dt><dd data-edit="programmes-t6">6 months</dd></div>
               <div><dt data-edit="programmes-t7">Schedule</dt><dd data-edit="programmes-t8">Mon–Fri · 9am–3pm</dd></div>
-              <div><dt data-edit="programmes-t9">Tuition</dt><dd data-edit="programmes-t10">₦450,000</dd></div>
               <div><dt data-edit="programmes-t11">Requirement</dt><dd data-edit="programmes-t12">No experience required</dd></div>
+              <div data-tuition-row="beginner" hidden><dt data-edit="programmes-t9">Tuition</dt><dd data-tuition="beginner"></dd></div>
             </dl>
 
             <p class="programme__desc" data-edit="programmes-t13">
@@ -301,8 +301,8 @@
             <dl class="programme__facts">
               <div><dt data-edit="programmes-t64">Duration</dt><dd data-edit="programmes-t65">4 months</dd></div>
               <div><dt data-edit="programmes-t66">Schedule</dt><dd data-edit="programmes-t67">Mon–Fri · 9am–2pm</dd></div>
-              <div><dt data-edit="programmes-t68">Tuition</dt><dd data-edit="programmes-t69">₦550,000</dd></div>
               <div><dt data-edit="programmes-t70">Requirement</dt><dd data-edit="programmes-t71">Basic sewing skills</dd></div>
+              <div data-tuition-row="intermediate" hidden><dt data-edit="programmes-t68">Tuition</dt><dd data-tuition="intermediate"></dd></div>
             </dl>
 
             <p class="programme__desc" data-edit="programmes-t72">
@@ -380,7 +380,7 @@
             </ul>
             <dl class="compare-card__facts">
               <div><dt data-edit="compare-t9">Duration</dt><dd data-edit="compare-t10">6 months</dd></div>
-              <div><dt data-edit="compare-t11">Tuition</dt><dd data-edit="compare-t12">₦450,000</dd></div>
+              <div data-tuition-row="beginner" hidden><dt data-edit="compare-t11">Tuition</dt><dd data-tuition="beginner"></dd></div>
             </dl>
             <a href="#register" class="btn btn--dark" data-programme="beginner">Apply Now</a>
           </div>
@@ -397,7 +397,7 @@
             </ul>
             <dl class="compare-card__facts">
               <div><dt data-edit="compare-t20">Duration</dt><dd data-edit="compare-t21">4 months</dd></div>
-              <div><dt data-edit="compare-t22">Tuition</dt><dd data-edit="compare-t23">₦550,000</dd></div>
+              <div data-tuition-row="intermediate" hidden><dt data-edit="compare-t22">Tuition</dt><dd data-tuition="intermediate"></dd></div>
             </dl>
             <a href="#register" class="btn btn--dark" data-programme="intermediate">Apply Now</a>
           </div>
@@ -500,8 +500,8 @@
                 <div class="select-wrap">
                   <select id="a-level" name="level" required aria-describedby="a-level-err">
                     <option value="">Choose your programme</option>
-                    <option value="beginner">Beginners to Advanced (6 months, ₦450,000)</option>
-                    <option value="intermediate">Upgrade: Intermediate &amp; Advanced (4 months, ₦550,000)</option>
+                    <option value="beginner" data-tuition-option="Beginners to Advanced (6 months)">Beginners to Advanced (6 months)</option>
+                    <option value="intermediate" data-tuition-option="Upgrade: Intermediate &amp; Advanced (4 months)">Upgrade: Intermediate &amp; Advanced (4 months)</option>
                   </select>
                 </div>
                 <p class="field__error" id="a-level-err"></p>

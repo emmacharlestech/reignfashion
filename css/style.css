@@ -3522,6 +3522,9 @@ body.menu-open .wa-float { display: none; }
   background: var(--c-line);
 }
 .programme__facts > div { padding: var(--space-3) var(--space-4); background: var(--c-white); }
+/* Tuition hidden (no fee set in Admin): the row above it spans the full width */
+.programme__facts > div:nth-child(odd):last-child,
+.programme__facts > div:nth-child(odd):has(+ [hidden]:last-child) { grid-column: 1 / -1; }
 .programme__facts dt,
 .compare-card__facts dt {
   margin-bottom: 2px;

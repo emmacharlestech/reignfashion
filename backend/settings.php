@@ -29,7 +29,8 @@ const SETTING_DEFS = [
     'tiktok_name'     => ['social', 'TikTok account name', 'text', 'Reign Fashion Academy Asaba', 80, ''],
     // Academy
     'academy_duration'=> ['academy', 'Course duration', 'text', '', 120, 'e.g. 3 months (Beginner) to 12 months (Professional Mastery)'],
-    'academy_fees'    => ['academy', 'Fees', 'text', '', 120, 'e.g. From ₦150,000, or "Available on enquiry"'],
+    'academy_fee_beginner' => ['academy', 'Tuition: Beginners to Advanced', 'text', '', 60, 'e.g. 450000 or ₦450,000. Leave empty to hide the price on the website.'],
+    'academy_fee_upgrade'  => ['academy', 'Tuition: Upgrade (Intermediate & Advanced)', 'text', '', 60, 'e.g. 550000 or ₦550,000. Leave empty to hide the price on the website.'],
     'academy_intake'  => ['academy', 'Next intake', 'text', '', 120, 'e.g. January 2027, or "Ongoing enrolment"'],
     // Payment
     'payment_methods' => ['payment', 'Ways customers can pay', 'choices:transfer=Bank transfer|cash=Cash at the studio|pos=Card / POS at the studio', 'transfer,cash,pos', 60, 'Tick every option you accept. Shown on the Contact page.'],
@@ -241,7 +242,10 @@ function public_settings(): array
         ],
         'academy' => [
             'duration' => $s['academy_duration'],
-            'fees'     => $s['academy_fees'],
+            'tuition'  => [
+                'beginner'     => $s['academy_fee_beginner'],
+                'intermediate' => $s['academy_fee_upgrade'],
+            ],
             'intake'   => $s['academy_intake'],
         ],
         // Bank details only when the owner chose to publish them and accepts transfers

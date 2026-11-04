@@ -29,7 +29,7 @@ $todo = [];
 if ($s['hours'] === '') $todo[] = ['Add your opening hours', 'settings#g-contact'];
 $missingSocial = array_filter(['Instagram' => 'instagram_url', 'Facebook' => 'facebook_url', 'TikTok' => 'tiktok_url'], fn($k) => $s[$k] === '');
 if ($missingSocial) $todo[] = ['Add your ' . implode(', ', array_keys($missingSocial)) . ' link' . (count($missingSocial) > 1 ? 's' : ''), 'settings#g-social'];
-if ($s['academy_duration'] === '' || $s['academy_fees'] === '' || $s['academy_intake'] === '') $todo[] = ['Add Academy duration, fees and next intake', 'settings#g-academy'];
+if ($s['academy_duration'] === '' || $s['academy_intake'] === '') $todo[] = ['Add Academy duration and next intake', 'settings#g-academy'];
 if ($s['payment_methods'] === '') $todo[] = ['Choose how customers can pay', 'settings#g-payment'];
 if (!bank_accounts($s)) $todo[] = ['Add your bank account details', 'settings#g-payment'];
 if (($p = alert_problem($s)) !== '' && $s['alerts'] === 'on') $todo[] = ['Email alerts: ' . rtrim(lcfirst($p), '.'), 'settings#g-alerts'];

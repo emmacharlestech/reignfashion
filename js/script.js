@@ -34,7 +34,7 @@
       tiktok:    { url: 'https://www.tiktok.com/@reignfashionacademy',    name: '@#Reign-Fashion-Academy Asaba' },
     },
     // Academy schedule & fees (empty = "To be confirmed")
-    academy: { duration: '', fees: '', intake: '' },
+    academy: { duration: '', intake: '', tuition: { beginner: '', intermediate: '' } },
     // Ways to pay and bank accounts (set in Admin → Settings → Payment)
     payment: { methods: [], terms: '', accounts: [] },
 
@@ -983,6 +983,25 @@
       if (!value) allSet = false;
     });
     document.querySelectorAll('[data-academy-pending]').forEach((tag) => { tag.hidden = allSet; });
+
+    // Programme tuition (Admin → Settings → Academy). Empty = price hidden.
+    const tuition = a.tuition ?? {};
+    const fee = (key) => {
+      const v = String(tuition[key] ?? '').trim();
+      // Plain digits ("450000") are shown as naira: ₦450,000
+      return /^\d+$/.test(v) ? '₦' + Number(v).toLocaleString('en-NG') : v;
+    };
+    document.querySelectorAll('[data-tuition]').forEach((dd) => {
+      const value = fee(dd.dataset.tuition);
+      dd.textContent = value;
+      const row = dd.closest('[data-tuition-row]');
+      if (row) row.hidden = !value;
+    });
+    document.querySelectorAll('option[data-tuition-option]').forEach((opt) => {
+      const label = opt.dataset.tuitionOption;
+      const value = fee(opt.value);
+      opt.textContent = value ? label.replace(/\)$/, ', ' + value + ')') : label;
+    });
   }
 
   /* ------------------------------------------------------------------------
