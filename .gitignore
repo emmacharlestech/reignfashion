@@ -7,6 +7,7 @@ deploy/
 # --- Customer and admin uploads (personal data / generated files) ------------
 backend/storage/uploads/*
 !backend/storage/uploads/index.html
+backend/storage/google-reviews.json*
 assets/uploads/gallery/*
 !assets/uploads/gallery/index.html
 

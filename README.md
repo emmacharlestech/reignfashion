@@ -367,6 +367,22 @@ A strong password is generated and shown once. Running the same command again fo
 
 **Consent text:** the consent sentence under the form is **draft wording**. Have Reign Fashion Empire review it. If a privacy policy page is added later, link to it from that sentence and from the footer.
 
+### Google reviews (home page)
+
+The **Google Reviews** section on the home page shows the rating and reviews from the Google Business Profile. Data comes from the Google Places API (New) through `api/google-reviews.php`. The section stays **hidden** until this is set up.
+
+1. In [Google Cloud Console](https://console.cloud.google.com/), create a project, turn on billing, and enable **Places API (New)**.
+2. Under **APIs & Services → Credentials**, create an API key. Restrict it to **Places API (New)**. The key is only used server-side, so you don't need a website restriction.
+3. In `backend/config.php`, set `'google_places_api_key' => 'your key'`. Copy the `google_*` lines from `config.example.php` if they're missing.
+4. Open the home page. The first load looks up the business by `google_place_query`. If the wrong listing appears, set `google_place_id` instead. You can find the ID with Google's [Place ID Finder](https://developers.google.com/maps/documentation/places/web-service/place-id).
+
+Notes:
+
+- Google returns **at most 5 reviews** (its "most relevant"). Reviews below `google_reviews_min_rating` (default 4 stars) and reviews with no text are left out.
+- Results are cached for 6 hours in `backend/storage/google-reviews.json`, about 120 API calls a month. That's well inside Google's free monthly allowance. To refresh immediately, delete that file.
+- If Google can't be reached, the last good copy keeps showing for up to 30 days. Errors go to the PHP error log as "Google reviews refresh failed".
+- "Write a Review" links to `google_review_url` (default `https://g.page/r/CQWysc0SiqdZEAI/review`).
+
 ---
 
 ## Update placeholder content

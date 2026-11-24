@@ -537,6 +537,41 @@
     </section>
 
     <!-- ============================================================
+         GOOGLE REVIEWS
+         Filled from the Google Business Profile by api/google-reviews.php
+         (Google Places API; key in backend/config.php). Stays hidden until
+         reviews load. Google returns up to 5 reviews.
+         ============================================================ -->
+    <section id="google-reviews" class="section reviews" aria-labelledby="reviews-title" data-google-reviews hidden>
+      <div class="container">
+        <header class="section-head section-head--center">
+          <p class="eyebrow">Google Reviews</p>
+          <h2 id="reviews-title" class="h2">Loved by Our <em>Clients</em></h2>
+          <p class="reviews__summary" data-reviews-summary></p>
+        </header>
+
+        <div class="reviews__carousel" role="region" aria-roledescription="carousel" aria-label="Google reviews">
+          <ul class="reviews__track" role="list" tabindex="0"></ul>
+          <div class="reviews__controls" hidden>
+            <button type="button" class="reviews__btn" data-reviews="prev" aria-label="Previous review">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <div class="reviews__dots" role="group" aria-label="Choose a review"></div>
+            <button type="button" class="reviews__btn" data-reviews="next" aria-label="Next review">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="btn-row reviews__actions">
+          <a class="btn btn--dark" href="https://g.page/r/CQWysc0SiqdZEAI/review" data-reviews-write target="_blank" rel="noopener">Write a Review</a>
+          <a class="link-arrow" href="https://maps.google.com/?cid=6460284003851284997" data-reviews-all target="_blank" rel="noopener">See All Reviews on Google</a>
+        </div>
+        <p class="reviews__source">Reviews from Google Maps</p>
+      </div>
+    </section>
+
+    <!-- ============================================================
          IN MOTION: videos of clients wearing Reign Fashion Empire designs
          Filled from Admin → Videos (api/videos.php). Stays hidden until
          at least one video is published. Same section on collections.html.

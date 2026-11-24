@@ -811,6 +811,182 @@
   }
 
   /* ------------------------------------------------------------------------
+     Google reviews: rating and reviews from the Google Business Profile
+     (api/google-reviews.php). The section stays hidden until reviews load.
+     Built with DOM methods only (review text is never parsed as HTML).
+     ------------------------------------------------------------------------ */
+  async function loadGoogleReviews() {
+    const section = document.querySelector('[data-google-reviews]');
+    const track = section && section.querySelector('.reviews__track');
+    if (!track || location.protocol === 'file:') return;
+    try {
+      const res = await fetch('api/google-reviews.php', { headers: { Accept: 'application/json' } });
+      if (!res.ok) return;
+      const { data } = await res.json();
+      if (!data || !Array.isArray(data.reviews) || !data.reviews.length) return;
+
+      const mk = (tag, cls, text) => {
+        const n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (text) n.textContent = text;
+        return n;
+      };
+      const safeUrl = (u) => (typeof u === 'string' && u.startsWith('https://') ? u : '');
+      const extLink = (cls, href, text) => {
+        const a = mk('a', cls, text);
+        a.href = href;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        return a;
+      };
+      const stars = (rating) => {
+        const r = Math.max(0, Math.min(5, Number(rating) || 0));
+        const s = mk('span', 'stars', '★★★★★');
+        s.style.setProperty('--fill', `${(r / 5) * 100}%`);
+        s.setAttribute('role', 'img');
+        s.setAttribute('aria-label', `Rated ${r} out of 5`);
+        return s;
+      };
+      const svgNS = 'http://www.w3.org/2000/svg';
+      const googleG = () => {
+        const svg = document.createElementNS(svgNS, 'svg');
+        svg.setAttribute('viewBox', '0 0 48 48');
+        svg.setAttribute('class', 'review-card__g');
+        svg.setAttribute('role', 'img');
+        svg.setAttribute('aria-label', 'Google review');
+        [
+          ['#EA4335', 'M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z'],
+          ['#4285F4', 'M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z'],
+          ['#FBBC05', 'M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z'],
+          ['#34A853', 'M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z'],
+        ].forEach(([fill, d]) => {
+          const p = document.createElementNS(svgNS, 'path');
+          p.setAttribute('fill', fill);
+          p.setAttribute('d', d);
+          svg.append(p);
+        });
+        return svg;
+      };
+      const initial = (name) => {
+        const span = mk('span', 'review-card__initial', (name.trim()[0] || 'G').toUpperCase());
+        span.setAttribute('aria-hidden', 'true');
+        return span;
+      };
+
+      track.replaceChildren(...data.reviews.map((r) => {
+        const author = String(r.author || 'Google user');
+        const li = mk('li', 'review-card');
+        const head = mk('div', 'review-card__head');
+
+        const photoUrl = safeUrl(r.photo);
+        if (photoUrl) {
+          const img = mk('img', 'review-card__photo');
+          img.src = photoUrl;
+          img.alt = '';
+          img.width = 44;
+          img.height = 44;
+          img.loading = 'lazy';
+          img.decoding = 'async';
+          img.referrerPolicy = 'no-referrer';     // Google profile photos refuse some referrers
+          img.addEventListener('error', () => img.replaceWith(initial(author)), { once: true });
+          head.append(img);
+        } else {
+          head.append(initial(author));
+        }
+
+        const who = mk('div', 'review-card__who');
+        const authorUrl = safeUrl(r.authorUrl);
+        who.append(authorUrl ? extLink('review-card__author', authorUrl, author) : mk('span', 'review-card__author', author));
+        if (r.time) who.append(mk('span', 'review-card__time', r.time));
+        head.append(who, googleG());
+
+        li.append(head, stars(r.rating), mk('p', 'review-card__text', r.text));
+        const reviewUrl = safeUrl(r.url);
+        if (reviewUrl) li.append(extLink('review-card__more', reviewUrl, 'Read on Google'));
+        return li;
+      }));
+      track.dataset.count = String(data.reviews.length);
+
+      const summary = section.querySelector('[data-reviews-summary]');
+      if (summary && data.rating > 0) {
+        const count = Number(data.count) || 0;
+        summary.replaceChildren(
+          mk('span', 'reviews__score', Number(data.rating).toFixed(1)),
+          stars(data.rating),
+          mk('span', '', count ? `Based on ${count.toLocaleString()} Google review${count === 1 ? '' : 's'}` : 'on Google'),
+        );
+      }
+      const write = section.querySelector('[data-reviews-write]');
+      if (write && safeUrl(data.writeUrl)) write.href = data.writeUrl;
+      const all = section.querySelector('[data-reviews-all]');
+      if (all && safeUrl(data.mapsUrl)) all.href = data.mapsUrl;
+
+      section.hidden = false;
+      initReviewsCarousel(section, track);
+    } catch (err) {
+      console.info('Google reviews unavailable.', err);
+    }
+  }
+
+  // Prev/next buttons and dots for the review row. One dot per scroll stop,
+  // so with three cards in view and five reviews there are three dots.
+  function initReviewsCarousel(section, track) {
+    const cards = [...track.children];
+    const controls = section.querySelector('.reviews__controls');
+    const dotsWrap = section.querySelector('.reviews__dots');
+    const prev = section.querySelector('[data-reviews="prev"]');
+    const next = section.querySelector('[data-reviews="next"]');
+    if (!controls || !cards.length) return;
+
+    let dots = [];
+    const step = () => (cards[1] ? cards[1].offsetLeft - cards[0].offsetLeft : track.clientWidth) || 1;
+    const stops = () => Math.round(Math.max(0, track.scrollWidth - track.clientWidth) / step()) + 1;
+    const current = () => {
+      const atEnd = track.scrollLeft >= track.scrollWidth - track.clientWidth - 2;
+      return atEnd ? stops() - 1 : Math.round(track.scrollLeft / step());
+    };
+    const go = (i) => {
+      const n = Math.max(0, Math.min(stops() - 1, i));
+      track.scrollTo({ left: n * step(), behavior: prefersReducedMotion.matches ? 'auto' : 'smooth' });
+    };
+    const update = () => {
+      const cur = current();
+      dots.forEach((d, i) => d.setAttribute('aria-current', i === cur ? 'true' : 'false'));
+      if (prev) prev.disabled = cur <= 0;
+      if (next) next.disabled = cur >= dots.length - 1;
+    };
+    const build = () => {
+      const count = stops();
+      controls.hidden = count < 2;
+      dots = count < 2 ? [] : Array.from({ length: count }, (_, i) => {
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'reviews__dot';
+        dot.setAttribute('aria-label', `Show reviews, position ${i + 1} of ${count}`);
+        dot.addEventListener('click', () => go(i));
+        return dot;
+      });
+      dotsWrap?.replaceChildren(...dots);
+      update();
+    };
+
+    prev?.addEventListener('click', () => go(current() - 1));
+    next?.addEventListener('click', () => go(current() + 1));
+    let frame = 0;
+    track.addEventListener('scroll', () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(update);
+    }, { passive: true });
+    let lastCount = -1;
+    const rebuildIfNeeded = () => {
+      const count = stops();
+      if (count !== lastCount) { lastCount = count; build(); } else { update(); }
+    };
+    if ('ResizeObserver' in window) new ResizeObserver(rebuildIfNeeded).observe(track);
+    rebuildIfNeeded();
+  }
+
+  /* ------------------------------------------------------------------------
      Contact details: fill every [data-contact] element from SITE_CONFIG
      ------------------------------------------------------------------------ */
   const el = (tag, props = {}, text = '') => {
@@ -1455,6 +1631,7 @@
     initCarousel();
     loadLiveTestimonials().then((replaced) => { if (replaced) refreshCarousels(); });
     loadDesignVideos();
+    loadGoogleReviews();
     initContactDetails();
     document.querySelectorAll('[data-year]').forEach((n) => { n.textContent = new Date().getFullYear(); });
     initWhatsApp();

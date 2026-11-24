@@ -2222,6 +2222,186 @@ body.menu-open .wordmark:focus-visible { outline-color: var(--c-gold); }
 }
 
 /* --------------------------------------------------------------------------
+   18c. Google reviews (from the Google Business Profile, api/google-reviews.php)
+   A swipeable row of cards: 1 on phones, 2 on tablets, 3 on desktops.
+   -------------------------------------------------------------------------- */
+.reviews[hidden] { display: none; }
+.reviews { background-color: var(--c-ivory-deep); }
+.reviews .section-head { margin-bottom: var(--space-6); }
+
+.reviews__summary {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2) var(--space-3);
+  margin-top: var(--space-4);
+  color: var(--c-ink-soft);
+}
+.reviews__summary:empty { display: none; }
+.reviews__score {
+  font-family: var(--f-serif);
+  font-size: 2.25rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--c-green);
+}
+
+/* Stars: one row of glyphs, filled to the rating with a gradient */
+.stars {
+  --fill: 100%;
+  display: inline-block;
+  font-size: 1.1rem;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  background: linear-gradient(90deg, #C9932F var(--fill), rgba(6, 42, 31, 0.2) var(--fill));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.reviews .reviews__track {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-1) var(--gutter) var(--space-3);
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: min(86%, 24rem);
+  gap: var(--space-4);
+  /* The row runs to the screen edges; cards still line up with the text */
+  margin-inline: calc(var(--gutter) * -1);
+  scroll-padding-inline: var(--gutter);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.reviews__track::-webkit-scrollbar { display: none; }
+.reviews__track:focus-visible { outline: 2px solid var(--c-gold-deep); outline-offset: 4px; border-radius: var(--radius-card); }
+.reviews__track[data-count="1"] { justify-content: center; }
+
+.review-card {
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-5);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-card);
+  background: var(--c-white);
+  box-shadow: 0 10px 30px rgba(6, 42, 31, 0.06);
+}
+.review-card__head { display: flex; align-items: center; gap: var(--space-3); }
+.review-card__photo,
+.review-card__initial {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.review-card__initial {
+  display: grid;
+  place-items: center;
+  background: var(--c-green);
+  color: var(--c-gold);
+  font-weight: 600;
+}
+.review-card__who { display: flex; flex-direction: column; min-width: 0; }
+.review-card__author {
+  font-weight: 600;
+  color: var(--c-green);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+a.review-card__author:hover { text-decoration: underline; }
+.review-card__time { font-size: var(--fs-sm); color: var(--c-ink-muted); }
+.review-card__g { flex: none; width: 22px; height: 22px; margin-left: auto; }
+.review-card__text {
+  margin: 0;
+  color: var(--c-ink-soft);
+  line-height: 1.65;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 7;
+  line-clamp: 7;
+  overflow: hidden;
+}
+.review-card__more {
+  margin-top: auto;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--c-gold-deep);
+}
+.review-card__more:hover { text-decoration: underline; }
+
+.reviews__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+.reviews__controls[hidden] { display: none; }
+.reviews__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--c-line);
+  border-radius: 50%;
+  color: var(--c-green);
+  transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease), opacity var(--dur) var(--ease);
+}
+.reviews__btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.reviews__btn:hover:not(:disabled) { border-color: var(--c-gold-deep); color: var(--c-gold-deep); }
+.reviews__btn:focus-visible { outline: 2px solid var(--c-gold-deep); outline-offset: 2px; }
+.reviews__btn:disabled { opacity: 0.35; cursor: default; }
+.reviews__dots { display: flex; }
+.reviews__dot {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.reviews__dot::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(10, 61, 46, 0.25);
+  transition: width var(--dur) var(--ease), background-color var(--dur) var(--ease);
+}
+.reviews__dot[aria-current="true"]::before { width: 24px; background: var(--c-gold-deep); }
+.reviews__dot:focus-visible { outline: 2px solid var(--c-gold-deep); outline-offset: -6px; border-radius: 8px; }
+
+.reviews__actions { justify-content: center; margin-top: var(--space-6); }
+.reviews__source {
+  margin-top: var(--space-4);
+  text-align: center;
+  font-size: var(--fs-xs);
+  color: var(--c-ink-muted);
+}
+
+@media (min-width: 48rem) {
+  .reviews .reviews__track {
+    grid-auto-columns: calc((100% - var(--space-5)) / 2);
+    gap: var(--space-5);
+  }
+}
+@media (min-width: 64rem) {
+  .reviews .reviews__track { grid-auto-columns: calc((100% - 2 * var(--space-5)) / 3); }
+}
+
+/* --------------------------------------------------------------------------
    19. Contact
    -------------------------------------------------------------------------- */
 .icon {

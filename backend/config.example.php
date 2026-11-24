@@ -31,6 +31,15 @@ return [
     'rate_limit_count'   => 5,
     'rate_limit_minutes' => 10,
 
+    // Google reviews carousel on the home page (Google Places API "New").
+    // Leave the key empty to hide the section. See README → Google reviews.
+    'google_places_api_key'     => '',
+    // Optional Place ID (starts "ChIJ…"). Empty = found once by searching google_place_query.
+    'google_place_id'           => '',
+    'google_place_query'        => 'Reign Fashion Empire, Asaba, Delta State',
+    'google_review_url'         => 'https://g.page/r/CQWysc0SiqdZEAI/review',
+    'google_reviews_min_rating' => 4,          // hide reviews below this many stars
+
     // Show PHP errors in responses. Keep false on a live site.
     'debug' => false,
 ];
